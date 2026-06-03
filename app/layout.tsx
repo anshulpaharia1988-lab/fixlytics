@@ -15,8 +15,8 @@ export const metadata: Metadata = {
     "Paste your link. We'll find the UX, SEO and speed issues holding you back — and write the fixes for you. No code. No jargon.",
 };
 
-const GA_ID      = process.env.NEXT_PUBLIC_GA_ID;
-const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
+const GA_ID      = process.env.NEXT_PUBLIC_GA_ID      || "G-E4T776TDLR";
+const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || "x1b3tvzpef";
 
 // Server-side debug — visible in terminal / Vercel build logs, not browser
 console.log("GA ID:", GA_ID || "(not set)");
