@@ -449,35 +449,7 @@ function ProductPreview() {
               marginBottom: 14,
             }}
           >
-            <div
-              style={{
-                width: 22,
-                height: 22,
-                borderRadius: 6,
-                background: "var(--navy-800)",
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  width: 10,
-                  height: 10,
-                  borderRadius: 2,
-                  background: "var(--green-400)",
-                }}
-              />
-            </div>
-            <div
-              style={{
-                fontWeight: 700,
-                color: "var(--navy-800)",
-                fontSize: 14,
-              }}
-            >
-              Fixlytics
-            </div>
+            <img src="/logo.png" alt="Fixlytics" style={{ height: 32, display: "block" }} />
           </div>
           {[
             { name: "Dashboard", icon: "layout-dashboard", active: false },
@@ -1152,36 +1124,24 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ─────────────── LOGO ROW ─────────────── */}
-      <section style={{ padding: "56px 0 24px", background: "var(--off-white)" }}>
+      {/* ─────────────── FEATURE STRIP ─────────────── */}
+      <section style={{ padding: "48px 0", background: "var(--off-white)" }}>
         <div className="pc-container" style={{ textAlign: "center" }}>
-          <div
-            style={{
-              fontSize: 13,
-              color: "var(--fg-3)",
-              fontWeight: 600,
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              marginBottom: 28,
-            }}
-          >
-            Trusted by 11,400+ small teams and indie creators
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: "clamp(28px, 5vw, 56px)",
-              opacity: 0.7,
-            }}
-          >
-            {["Loomweave", "Northside", "Glasshouse", "Stratum", "Halcyon", "Westwind", "Mosaic"].map(
-              (name) => (
-                <FakeLogo key={name} name={name} />
-              )
-            )}
+          <p style={{
+            fontSize: 14, color: "var(--fg-3)", fontWeight: 500,
+            letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 16,
+          }}>
+            Early access — join site owners already improving their scores
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 32, flexWrap: "wrap" }}>
+            {["Free audit", "No signup", "90 sec scan", "Real data", "AI fixes"].map((tag) => (
+              <span key={tag} style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                fontSize: 15, fontWeight: 500, color: "var(--fg-2)",
+              }}>
+                <span style={{ color: "var(--green-600)" }}>✓</span> {tag}
+              </span>
+            ))}
           </div>
         </div>
       </section>
@@ -1223,8 +1183,8 @@ export default function LandingPage({
             </div>
             <Heading
               level={2}
-              before="Built to"
-              accent="ship results."
+              before="Built to find real issues,"
+              accent="fast."
               style={{ fontSize: "clamp(36px, 5vw, 56px)" }}
             />
           </div>
@@ -1283,12 +1243,6 @@ export default function LandingPage({
               </div>
             ))}
           </div>
-          <p style={{
-            textAlign: "center", marginTop: 20, fontSize: 12.5,
-            color: "var(--fg-3)", fontStyle: "italic",
-          }}>
-            Based on beta user feedback and audit data
-          </p>
         </div>
       </section>
 
@@ -1354,33 +1308,46 @@ export default function LandingPage({
         </div>
       </section>
 
-      {/* ─────────────── TESTIMONIALS ─────────────── */}
-      <section
-        style={{
-          padding: "clamp(80px, 11vw, 144px) 0",
-          background: "var(--off-white)",
-          position: "relative",
-        }}
-      >
-        <div className="pc-container">
-          <div style={{ textAlign: "center", marginBottom: 72 }}>
-            <Eyebrow>Customers</Eyebrow>
-            <Heading
-              level={2}
-              before="Loved by people who"
-              accent="don't speak code."
-              style={{ fontSize: "clamp(36px, 5vw, 56px)" }}
-            />
+      {/* ─────────────── EARLY ACCESS ─────────────── */}
+      <section style={{ padding: "clamp(80px, 11vw, 144px) 0", background: "var(--off-white)" }}>
+        <div className="pc-container" style={{ textAlign: "center", maxWidth: 680 }}>
+          <div style={{
+            fontSize: 12, color: "var(--green-600)", fontWeight: 600,
+            letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 14,
+          }}>
+            Early access
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-              gap: 24,
-            }}
-          >
-            {TESTIMONIALS.map((t, i) => (
-              <TestimonialCard key={i} t={t} featured={i === 0} />
+          <h2 style={{
+            fontFamily: "var(--font-sans)", fontWeight: 700,
+            fontSize: "clamp(32px, 4vw, 48px)", letterSpacing: "-0.02em",
+            color: "var(--navy-800)", margin: "0 0 20px",
+          }}>
+            Be among the first to try Fixlytics.
+          </h2>
+          <p style={{ fontSize: 18, lineHeight: 1.6, color: "var(--fg-2)", margin: "0 0 40px" }}>
+            We are in early access. Every audit helps us improve.
+            Your feedback shapes the product directly.
+          </p>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: 20, maxWidth: 600, margin: "0 auto",
+          }}>
+            {[
+              { icon: "🎯", text: "Real PageSpeed data" },
+              { icon: "🔍", text: "Live HTML checks" },
+              { icon: "💡", text: "AI-powered fixes" },
+              { icon: "⚡", text: "Results in 90 seconds" },
+            ].map((item) => (
+              <div key={item.text} style={{
+                background: "#fff", borderRadius: 16, padding: "20px",
+                border: "1px solid var(--border)",
+                display: "flex", alignItems: "center", gap: 12,
+                fontSize: 15, fontWeight: 500, color: "var(--navy-800)",
+              }}>
+                <span style={{ fontSize: 24 }}>{item.icon}</span>
+                {item.text}
+              </div>
             ))}
           </div>
         </div>

@@ -157,10 +157,10 @@ export const HOTSPOTS: Hotspot[] = [
 ];
 
 export const STAT_STRIP = [
-  { value: "1,240+", label: "Sites Audited" },
-  { value: "8,900+", label: "Fixes Shipped" },
-  { value: "4.7 / 5", label: "Average Rating" },
-  { value: "94%", label: "Would Recommend" },
+  { value: "90 sec", label: "Average audit time" },
+  { value: "60+",    label: "Checks per audit" },
+  { value: "Free",   label: "Basic audit cost" },
+  { value: "₹2,400", label: "Full report, one-time" },
 ];
 
 export interface Testimonial {
