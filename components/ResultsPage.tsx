@@ -517,9 +517,8 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
 }
 
 // ── LockedPremiumPanel ────────────────────────────────────────────────────────
-function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, emailValue, onEmailChange }: {
+function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
   currency: string; price: number; lockedCount: number; onUnlock: () => void;
-  emailValue: string; onEmailChange: (v: string) => void;
 }) {
   return (
     <div style={{
@@ -719,18 +718,6 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, emailValue
             <Icon name="tag" size={12} /> 50% off  - ends in 2 days
           </div>
 
-          <input
-            type="email"
-            value={emailValue}
-            onChange={(e) => onEmailChange(e.target.value)}
-            placeholder="your@email.com (receipt will be sent here)"
-            style={{
-              width: "100%", padding: "12px 16px", fontSize: 14, marginBottom: 12,
-              border: "1px solid rgba(255,255,255,0.20)", borderRadius: 10,
-              outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-              color: "#fff", background: "rgba(255,255,255,0.10)",
-            }}
-          />
           <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
             Unlock Full Report
           </Button>
@@ -812,6 +799,7 @@ export default function ResultsPage({
   const [copied, setCopied] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [showEmailModal, setShowEmailModal] = useState(false);
 
   // On mount, confirm paid status from localStorage (catches direct navigation
   // or cases where initialPaid wasn't passed).
@@ -845,7 +833,8 @@ export default function ResultsPage({
     }
   }
 
-  async function handleUnlock() {
+  // Actual Razorpay checkout — only called after email is confirmed
+  async function runPayment() {
     const loaded = await loadRazorpayScript();
     if (!loaded) {
       alert("Could not load payment gateway. Please try again.");
@@ -867,13 +856,7 @@ export default function ResultsPage({
       order_id: orderId,
       theme: { color: "#00c758" },
       "_payment_button_logo": false,
-      prefill: {
-        name: "",
-        email: "",
-        contact: "",
-        "method": "card",
-        "card[number]": "4111111111111111",
-      },
+      prefill: { email: userEmail },
       config: {
         display: {
           blocks: {
@@ -904,6 +887,15 @@ export default function ResultsPage({
       },
     });
     rzp.open();
+  }
+
+  // Entry point for all unlock actions — gates on email first
+  function handleUnlock() {
+    if (!userEmail.trim()) {
+      setShowEmailModal(true);
+    } else {
+      runPayment();
+    }
   }
 
   useEffect(() => {
@@ -1137,11 +1129,115 @@ export default function ResultsPage({
               price={price}
               lockedCount={lockedCount}
               onUnlock={handleUnlock}
-              emailValue={userEmail}
-              onEmailChange={setUserEmail}
             />
           </div>
         </section>
+      )}
+
+      {/* Email collection modal — shown before Razorpay when no email is set */}
+      {showEmailModal && (
+        <div
+          onClick={() => setShowEmailModal(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 1001,
+            background: "rgba(5,13,26,0.78)",
+            backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
+              maxWidth: 440, width: "100%", position: "relative",
+              boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+              textAlign: "center",
+            }}
+          >
+            <button
+              onClick={() => setShowEmailModal(false)}
+              style={{
+                position: "absolute", top: 16, right: 16,
+                background: "var(--bg-page)", border: "1px solid var(--border)",
+                borderRadius: 8, width: 32, height: 32, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                color: "var(--fg-3)", fontFamily: "inherit",
+              }}
+            >
+              <Icon name="x" size={16} />
+            </button>
+
+            <div style={{
+              width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px",
+              background: "var(--green-glow)", border: "1.5px solid var(--green-200)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <Icon name="mail" size={28} color="var(--green-600)" />
+            </div>
+
+            <h3 style={{
+              fontSize: 24, fontWeight: 800, letterSpacing: "-0.025em",
+              color: "var(--navy-800)", margin: "0 0 10px", lineHeight: 1.1,
+            }}>Where should we send your report?</h3>
+
+            <p style={{
+              fontSize: 15, lineHeight: 1.6, color: "var(--fg-2)",
+              margin: "0 0 24px",
+            }}>
+              We&apos;ll email you access details and your PDF report.
+            </p>
+
+            <input
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && userEmail.trim()) {
+                  setShowEmailModal(false);
+                  runPayment();
+                }
+              }}
+              placeholder="your@email.com"
+              autoFocus
+              style={{
+                width: "100%", padding: "14px 16px", fontSize: 16,
+                border: "1.5px solid var(--border)", borderRadius: 12,
+                outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+                marginBottom: 14, color: "var(--navy-800)", background: "#fff",
+                textAlign: "center",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                if (!userEmail.trim()) return;
+                setShowEmailModal(false);
+                runPayment();
+              }}
+              disabled={!userEmail.trim()}
+              style={{
+                width: "100%", padding: "16px 24px",
+                background: userEmail.trim()
+                  ? "linear-gradient(135deg, #00d467 0%, #00a851 100%)"
+                  : "var(--bg-page)",
+                color: userEmail.trim() ? "#fff" : "var(--fg-3)",
+                border: userEmail.trim() ? "none" : "1.5px solid var(--border)",
+                borderRadius: 14, cursor: userEmail.trim() ? "pointer" : "default",
+                fontFamily: "inherit", fontSize: 16, fontWeight: 700,
+                boxShadow: userEmail.trim() ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",
+                letterSpacing: "-0.01em", marginBottom: 12,
+                transition: "all 150ms var(--ease-out)",
+              }}
+            >
+              Continue to payment
+            </button>
+
+            <p style={{ fontSize: 13, color: "var(--fg-3)", margin: 0 }}>
+              One-time payment &middot; 30 days access &middot; 7-day guarantee
+            </p>
+          </div>
+        </div>
       )}
 
       {/* PDF upsell modal — shown when unpaid user clicks Export PDF */}
@@ -1203,18 +1299,6 @@ export default function ResultsPage({
               copy-paste fixes, and action checklist.
             </p>
 
-            <input
-              type="email"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              placeholder="your@email.com (for receipt)"
-              style={{
-                width: "100%", padding: "12px 16px", fontSize: 15,
-                border: "1.5px solid var(--border)", borderRadius: 10,
-                outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-                marginBottom: 12, color: "var(--navy-800)", background: "#fff",
-              }}
-            />
             <button
               onClick={() => { setShowPdfModal(false); handleUnlock(); }}
               style={{
