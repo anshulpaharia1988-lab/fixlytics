@@ -24,11 +24,12 @@ export default function Icon({
   strokeWidth = 2,
   style,
 }: IconProps) {
-  const IconComponent = (LucideIcons as Record<string, React.ComponentType<{
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const IconComponent = (LucideIcons as any)[toPascal(name)] as React.ComponentType<{
     size?: number;
     color?: string;
     strokeWidth?: number;
-  }>>)[toPascal(name)];
+  }>;
 
   if (!IconComponent) {
     return (

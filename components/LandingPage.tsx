@@ -30,7 +30,7 @@ function Heading({
     2: "clamp(30px, 3.6vw, 44px)",
     3: "clamp(22px, 2vw, 26px)",
   };
-  const Tag = `h${level}` as keyof JSX.IntrinsicElements;
+  const Tag = `h${level}` as "h1" | "h2" | "h3";
   return (
     <Tag
       style={{
