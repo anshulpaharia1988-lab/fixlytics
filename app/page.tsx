@@ -32,27 +32,29 @@ export default function Home() {
   const [auditData, setAuditData] = useState<AuditData | null>(null);
   const [urlIsPaid, setUrlIsPaid] = useState(false);
 
-  // On mount: restore last session from sessionStorage
+  // On mount: restore last session from sessionStorage.
+  // mounted guard prevents state updates from racing with HMR unmount/remount.
   useEffect(() => {
+    let mounted = true;
     try {
-      const savedUrl  = sessionStorage.getItem(KEY_URL);
-      if (!savedUrl) return;
+      const savedUrl = sessionStorage.getItem(KEY_URL);
+      if (!savedUrl || !mounted) return;
 
       const paid = isPaid(savedUrl);
+      if (!mounted) return;
+
       setUrl(savedUrl);
       setUrlIsPaid(paid);
 
       if (paid) {
-        // Paid URL: restore cached audit data and show results immediately
         const raw = sessionStorage.getItem(KEY_DATA);
         const cached: AuditData | null = raw ? JSON.parse(raw) : null;
-        setAuditData(cached);
-        setView("results");
+        if (mounted) { setAuditData(cached); setView("results"); }
       } else {
-        // Unpaid URL: re-run scan (we need fresh data)
-        setView("scan");
+        if (mounted) setView("scan");
       }
     } catch { /* sessionStorage unavailable */ }
+    return () => { mounted = false; };
   }, []);
 
   function handleAudit(targetUrl: string) {

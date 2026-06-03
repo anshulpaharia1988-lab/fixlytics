@@ -10,17 +10,13 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Fixlytics — Fix Your Website in Minutes with AI",
+  title: "Fixlytics | Fix Your Website in Minutes with AI",
   description:
     "Paste your link. We'll find the UX, SEO and speed issues holding you back — and write the fixes for you. No code. No jargon.",
 };
 
 const GA_ID      = process.env.NEXT_PUBLIC_GA_ID      || "G-E4T776TDLR";
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID || "x1b3tvzpef";
-
-// Server-side debug — visible in terminal / Vercel build logs, not browser
-console.log("GA ID:", GA_ID || "(not set)");
-console.log("Clarity ID:", CLARITY_ID || "(not set)");
 
 export default function RootLayout({
   children,
