@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import crypto from "crypto";
 import { Resend } from "resend";
+import { savePayment } from "@/lib/paymentDB";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -18,6 +19,13 @@ export async function POST(req: NextRequest) {
     const success = expected === razorpay_signature;
 
     if (success && email) {
+      // Persist to Vercel KV so user can recover access on any device
+      try {
+        await savePayment(email, auditUrl ?? "");
+      } catch (kvErr) {
+        console.error("[verify] KV save failed:", kvErr);
+      }
+
       try {
         await resend.emails.send({
           from: "Fixlytics <onboarding@resend.dev>",

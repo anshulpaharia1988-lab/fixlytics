@@ -49,3 +49,5 @@ audit_bbc.json
 audit_out.json
 audit_result.json
 smart.json
+
+.vercel

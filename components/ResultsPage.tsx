@@ -800,6 +800,9 @@ export default function ResultsPage({
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [showRecoverModal, setShowRecoverModal] = useState(false);
+  const [recoverEmail, setRecoverEmail] = useState("");
+  const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "not-found">("idle");
 
   // On mount, confirm paid status from localStorage (catches direct navigation
   // or cases where initialPaid wasn't passed).
@@ -895,6 +898,31 @@ export default function ResultsPage({
       setShowEmailModal(true);
     } else {
       runPayment();
+    }
+  }
+
+  async function handleRecoverAccess() {
+    if (!recoverEmail.trim()) return;
+    setRecoverStatus("checking");
+    try {
+      const res = await fetch(
+        `/api/payment/check?email=${encodeURIComponent(recoverEmail)}&url=${encodeURIComponent(url)}`
+      );
+      const data = await res.json();
+      if (data.paid) {
+        setRecoverStatus("found");
+        markAsPaid(url);
+        setUserEmail(recoverEmail);
+        setTimeout(() => {
+          setIsPaid(true);
+          setShowRecoverModal(false);
+          setRecoverStatus("idle");
+        }, 1200);
+      } else {
+        setRecoverStatus("not-found");
+      }
+    } catch {
+      setRecoverStatus("not-found");
     }
   }
 
@@ -1122,7 +1150,7 @@ export default function ResultsPage({
 
       {/* Locked premium */}
       {!isPaid && (
-        <section className="paywall-section no-print" style={{ padding: "24px 0 80px" }}>
+        <section className="paywall-section no-print" style={{ padding: "24px 0 48px" }}>
           <div className="pc-container">
             <LockedPremiumPanel
               currency={currency}
@@ -1130,8 +1158,117 @@ export default function ResultsPage({
               lockedCount={lockedCount}
               onUnlock={handleUnlock}
             />
+            {/* Already paid recovery link */}
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <button
+                onClick={() => { setShowRecoverModal(true); setRecoverStatus("idle"); setRecoverEmail(""); }}
+                style={{
+                  background: "none", border: 0, cursor: "pointer",
+                  fontSize: 14, color: "var(--fg-3)", fontFamily: "inherit",
+                  textDecoration: "underline", textDecorationStyle: "dotted",
+                }}
+              >
+                Already paid? Restore your access →
+              </button>
+            </div>
           </div>
         </section>
+      )}
+
+      {/* Already paid? recovery modal */}
+      {showRecoverModal && (
+        <div
+          onClick={() => setShowRecoverModal(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 1001,
+            background: "rgba(5,13,26,0.78)",
+            backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
+              maxWidth: 420, width: "100%", position: "relative",
+              boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+              textAlign: "center",
+            }}
+          >
+            <button
+              onClick={() => setShowRecoverModal(false)}
+              style={{
+                position: "absolute", top: 16, right: 16,
+                background: "var(--bg-page)", border: "1px solid var(--border)",
+                borderRadius: 8, width: 32, height: 32, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                color: "var(--fg-3)", fontFamily: "inherit",
+              }}
+            >
+              <Icon name="x" size={16} />
+            </button>
+
+            <div style={{
+              width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px",
+              background: "var(--green-glow)", border: "1.5px solid var(--green-200)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <Icon name="key" size={28} color="var(--green-600)" />
+            </div>
+
+            <h3 style={{
+              fontSize: 24, fontWeight: 800, letterSpacing: "-0.025em",
+              color: "var(--navy-800)", margin: "0 0 10px",
+            }}>Restore your access</h3>
+            <p style={{ fontSize: 15, color: "var(--fg-2)", margin: "0 0 24px", lineHeight: 1.6 }}>
+              Enter the email you used when you paid. We&apos;ll restore your full report access.
+            </p>
+
+            <input
+              type="email"
+              value={recoverEmail}
+              onChange={(e) => { setRecoverEmail(e.target.value); setRecoverStatus("idle"); }}
+              onKeyDown={(e) => e.key === "Enter" && handleRecoverAccess()}
+              placeholder="your@email.com"
+              autoFocus
+              style={{
+                width: "100%", padding: "14px 16px", fontSize: 16,
+                border: "1.5px solid var(--border)", borderRadius: 12,
+                outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+                marginBottom: 12, color: "var(--navy-800)", background: "#fff",
+                textAlign: "center",
+              }}
+            />
+
+            {recoverStatus === "not-found" && (
+              <p style={{ fontSize: 13, color: "var(--danger)", marginBottom: 10 }}>
+                No payment found for this email + site. <a href="mailto:support@fixlytics.app" style={{ color: "var(--green-600)" }}>Contact support</a>
+              </p>
+            )}
+            {recoverStatus === "found" && (
+              <p style={{ fontSize: 13, color: "var(--green-600)", fontWeight: 600, marginBottom: 10 }}>
+                ✓ Access restored! Loading your full report…
+              </p>
+            )}
+
+            <button
+              onClick={handleRecoverAccess}
+              disabled={!recoverEmail.trim() || recoverStatus === "checking" || recoverStatus === "found"}
+              style={{
+                width: "100%", padding: "14px 24px",
+                background: recoverEmail.trim() ? "linear-gradient(135deg, #00d467, #00a851)" : "var(--bg-page)",
+                color: recoverEmail.trim() ? "#fff" : "var(--fg-3)",
+                border: recoverEmail.trim() ? "none" : "1.5px solid var(--border)",
+                borderRadius: 14, cursor: recoverEmail.trim() ? "pointer" : "default",
+                fontFamily: "inherit", fontSize: 15, fontWeight: 700,
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {recoverStatus === "checking" ? "Checking…" : "Restore access"}
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Email collection modal — shown before Razorpay when no email is set */}
