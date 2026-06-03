@@ -18,6 +18,10 @@ export const metadata: Metadata = {
 const GA_ID      = process.env.NEXT_PUBLIC_GA_ID;
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_ID;
 
+// Server-side debug — visible in terminal / Vercel build logs, not browser
+console.log("GA ID:", GA_ID || "(not set)");
+console.log("Clarity ID:", CLARITY_ID || "(not set)");
+
 export default function RootLayout({
   children,
 }: {
