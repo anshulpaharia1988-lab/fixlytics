@@ -517,8 +517,9 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
 }
 
 // ── LockedPremiumPanel ────────────────────────────────────────────────────────
-function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
+function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, emailValue, onEmailChange }: {
   currency: string; price: number; lockedCount: number; onUnlock: () => void;
+  emailValue: string; onEmailChange: (v: string) => void;
 }) {
   return (
     <div style={{
@@ -718,6 +719,18 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             <Icon name="tag" size={12} /> 50% off  - ends in 2 days
           </div>
 
+          <input
+            type="email"
+            value={emailValue}
+            onChange={(e) => onEmailChange(e.target.value)}
+            placeholder="your@email.com (receipt will be sent here)"
+            style={{
+              width: "100%", padding: "12px 16px", fontSize: 14, marginBottom: 12,
+              border: "1px solid rgba(255,255,255,0.20)", borderRadius: 10,
+              outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+              color: "#fff", background: "rgba(255,255,255,0.10)",
+            }}
+          />
           <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
             Unlock Full Report
           </Button>
@@ -798,6 +811,7 @@ export default function ResultsPage({
   const [isPaid, setIsPaid] = useState(initialPaid);
   const [copied, setCopied] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   // On mount, confirm paid status from localStorage (catches direct navigation
   // or cases where initialPaid wasn't passed).
@@ -880,7 +894,7 @@ export default function ResultsPage({
         const verifyRes = await fetch("/api/payment/verify", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(response),
+          body: JSON.stringify({ ...response, email: userEmail, auditUrl: url }),
         });
         const { success } = await verifyRes.json();
         if (success) {
@@ -1123,6 +1137,8 @@ export default function ResultsPage({
               price={price}
               lockedCount={lockedCount}
               onUnlock={handleUnlock}
+              emailValue={userEmail}
+              onEmailChange={setUserEmail}
             />
           </div>
         </section>
@@ -1187,6 +1203,18 @@ export default function ResultsPage({
               copy-paste fixes, and action checklist.
             </p>
 
+            <input
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="your@email.com (for receipt)"
+              style={{
+                width: "100%", padding: "12px 16px", fontSize: 15,
+                border: "1.5px solid var(--border)", borderRadius: 10,
+                outline: "none", fontFamily: "inherit", boxSizing: "border-box",
+                marginBottom: 12, color: "var(--navy-800)", background: "#fff",
+              }}
+            />
             <button
               onClick={() => { setShowPdfModal(false); handleUnlock(); }}
               style={{
