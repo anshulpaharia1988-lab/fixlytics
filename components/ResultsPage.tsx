@@ -800,6 +800,7 @@ export default function ResultsPage({
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailError, setEmailError] = useState("");
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [recoverEmail, setRecoverEmail] = useState("");
   const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "not-found">("idle");
@@ -892,13 +893,26 @@ export default function ResultsPage({
     rzp.open();
   }
 
-  // Entry point for all unlock actions — gates on email first
+  function isValidEmail(email: string): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }
+
+  // Entry point for ALL unlock actions — always shows email modal first.
+  // Email must be validated before Razorpay opens; there is no skip path.
   function handleUnlock() {
-    if (!userEmail.trim()) {
-      setShowEmailModal(true);
-    } else {
-      runPayment();
+    setUserEmail("");
+    setEmailError("");
+    setShowEmailModal(true);
+  }
+
+  function handleEmailSubmit() {
+    if (!isValidEmail(userEmail)) {
+      setEmailError("Please enter a valid email address");
+      return;
     }
+    setEmailError("");
+    setShowEmailModal(false);
+    runPayment();
   }
 
   async function handleRecoverAccess() {
@@ -1271,29 +1285,28 @@ export default function ResultsPage({
         </div>
       )}
 
-      {/* Email collection modal — shown before Razorpay when no email is set */}
+      {/* Email collection modal — mandatory, no skip path */}
       {showEmailModal && (
         <div
-          onClick={() => setShowEmailModal(false)}
           style={{
             position: "fixed", inset: 0, zIndex: 1001,
-            background: "rgba(5,13,26,0.78)",
+            background: "rgba(5,13,26,0.82)",
             backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
             display: "flex", alignItems: "center", justifyContent: "center",
             padding: 24,
+            // No onClick on overlay — cannot be dismissed by clicking outside
           }}
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
-              maxWidth: 440, width: "100%", position: "relative",
-              boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
-              textAlign: "center",
-            }}
-          >
+          <div style={{
+            background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
+            maxWidth: 440, width: "100%", position: "relative",
+            boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+            textAlign: "center",
+          }}>
+            {/* X cancels entirely — no proceed without email */}
             <button
-              onClick={() => setShowEmailModal(false)}
+              onClick={() => { setShowEmailModal(false); setEmailError(""); }}
+              title="Cancel"
               style={{
                 position: "absolute", top: 16, right: 16,
                 background: "var(--bg-page)", border: "1px solid var(--border)",
@@ -1319,8 +1332,7 @@ export default function ResultsPage({
             }}>Where should we send your report?</h3>
 
             <p style={{
-              fontSize: 15, lineHeight: 1.6, color: "var(--fg-2)",
-              margin: "0 0 24px",
+              fontSize: 15, lineHeight: 1.6, color: "var(--fg-2)", margin: "0 0 24px",
             }}>
               We&apos;ll email you access details and your PDF report.
             </p>
@@ -1328,46 +1340,45 @@ export default function ResultsPage({
             <input
               type="email"
               value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && userEmail.trim()) {
-                  setShowEmailModal(false);
-                  runPayment();
-                }
-              }}
+              onChange={(e) => { setUserEmail(e.target.value); setEmailError(""); }}
+              onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
               placeholder="your@email.com"
               autoFocus
               style={{
                 width: "100%", padding: "14px 16px", fontSize: 16,
-                border: "1.5px solid var(--border)", borderRadius: 12,
-                outline: "none", fontFamily: "inherit", boxSizing: "border-box",
-                marginBottom: 14, color: "var(--navy-800)", background: "#fff",
-                textAlign: "center",
+                border: `1.5px solid ${emailError ? "var(--danger)" : "var(--border)"}`,
+                borderRadius: 12, outline: "none", fontFamily: "inherit",
+                boxSizing: "border-box", marginBottom: emailError ? 8 : 14,
+                color: "var(--navy-800)", background: "#fff", textAlign: "center",
               }}
             />
 
+            {emailError && (
+              <p style={{
+                fontSize: 13, color: "var(--danger)", margin: "0 0 12px",
+                fontWeight: 500,
+              }}>{emailError}</p>
+            )}
+
             <button
-              onClick={() => {
-                if (!userEmail.trim()) return;
-                setShowEmailModal(false);
-                runPayment();
-              }}
+              onClick={handleEmailSubmit}
               disabled={!userEmail.trim()}
               style={{
                 width: "100%", padding: "16px 24px",
-                background: userEmail.trim()
+                background: isValidEmail(userEmail)
                   ? "linear-gradient(135deg, #00d467 0%, #00a851 100%)"
                   : "var(--bg-page)",
-                color: userEmail.trim() ? "#fff" : "var(--fg-3)",
-                border: userEmail.trim() ? "none" : "1.5px solid var(--border)",
-                borderRadius: 14, cursor: userEmail.trim() ? "pointer" : "default",
+                color: isValidEmail(userEmail) ? "#fff" : "var(--fg-3)",
+                border: isValidEmail(userEmail) ? "none" : "1.5px solid var(--border)",
+                borderRadius: 14,
+                cursor: userEmail.trim() ? "pointer" : "not-allowed",
                 fontFamily: "inherit", fontSize: 16, fontWeight: 700,
-                boxShadow: userEmail.trim() ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",
+                boxShadow: isValidEmail(userEmail) ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",
                 letterSpacing: "-0.01em", marginBottom: 12,
                 transition: "all 150ms var(--ease-out)",
               }}
             >
-              Continue to payment
+              Continue to Payment →
             </button>
 
             <p style={{ fontSize: 13, color: "var(--fg-3)", margin: 0 }}>
