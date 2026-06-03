@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# screenshots and test artifacts
+/screenshots/
+dev.log
+verify-payment.mjs
+.thumbnail
+audit_bbc.json
+audit_out.json
+audit_result.json
+smart.json
