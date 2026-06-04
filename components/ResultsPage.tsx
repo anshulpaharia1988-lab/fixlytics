@@ -1,6 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
-import { useSession } from "next-auth/react";
+import { useSession, signIn } from "next-auth/react";
 import type { CSSProperties, ReactNode } from "react";
 import Button from "./Button";
 import Icon from "./Icon";
@@ -800,20 +800,29 @@ export default function ResultsPage({
   const [copied, setCopied] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [emailError, setEmailError] = useState("");
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [recoverEmail, setRecoverEmail] = useState("");
   const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "not-found">("idle");
+  // session must be declared before any useEffect that references it
+  const { data: session } = useSession();
 
-  // On mount, confirm paid status from localStorage (catches direct navigation
-  // or cases where initialPaid wasn't passed).
+  // On mount: check localStorage first
   useEffect(() => {
     if (!isPaid && url && checkIsPaid(url)) {
       setIsPaid(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
+
+  // When session is available: check server-side payment status for cross-device access
+  useEffect(() => {
+    if (isPaid || !session?.user?.email || !url) return;
+    fetch(`/api/payment/status?url=${encodeURIComponent(url)}`)
+      .then((r) => r.json())
+      .then((data) => { if (data.paid) { markAsPaid(url); setIsPaid(true); } })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.email, url]);
 
   function handleRerun() {
     if (onRerun) onRerun();
@@ -894,33 +903,15 @@ export default function ResultsPage({
     rzp.open();
   }
 
-  function isValidEmail(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  }
-
-  // Entry point for ALL unlock actions.
-  // If the user is signed in, use their session email and skip the modal.
-  // Otherwise show the mandatory email modal.
+  // All unlock actions require a signed-in session.
+  // If not authenticated, redirect to /login then return to this page.
   function handleUnlock() {
     const sessionEmail = session?.user?.email;
-    if (sessionEmail) {
-      setUserEmail(sessionEmail);
-      setEmailError("");
-      runPayment();
-    } else {
-      setUserEmail("");
-      setEmailError("");
-      setShowEmailModal(true);
-    }
-  }
-
-  function handleEmailSubmit() {
-    if (!isValidEmail(userEmail)) {
-      setEmailError("Please enter a valid email address");
+    if (!sessionEmail) {
+      signIn(undefined, { callbackUrl: window.location.href });
       return;
     }
-    setEmailError("");
-    setShowEmailModal(false);
+    setUserEmail(sessionEmail);
     runPayment();
   }
 
@@ -965,8 +956,6 @@ export default function ResultsPage({
     () => issues.filter((i) => activeArea === "all" || i.area === activeArea),
     [activeArea, issues]
   );
-
-  const { data: session } = useSession();
 
   const criticalCount = issues.filter((i) => i.severity === "high").length;
   const overallScore  = Math.round((scores.ux.value + scores.seo.value + scores.speed.value) / 3);
@@ -1296,108 +1285,6 @@ export default function ResultsPage({
         </div>
       )}
 
-      {/* Email collection modal — mandatory, no skip path */}
-      {showEmailModal && (
-        <div
-          style={{
-            position: "fixed", inset: 0, zIndex: 1001,
-            background: "rgba(5,13,26,0.82)",
-            backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 24,
-            // No onClick on overlay — cannot be dismissed by clicking outside
-          }}
-        >
-          <div style={{
-            background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
-            maxWidth: 440, width: "100%", position: "relative",
-            boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
-            textAlign: "center",
-          }}>
-            {/* X cancels entirely — no proceed without email */}
-            <button
-              onClick={() => { setShowEmailModal(false); setEmailError(""); }}
-              title="Cancel"
-              style={{
-                position: "absolute", top: 16, right: 16,
-                background: "var(--bg-page)", border: "1px solid var(--border)",
-                borderRadius: 8, width: 32, height: 32, cursor: "pointer",
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                color: "var(--fg-3)", fontFamily: "inherit",
-              }}
-            >
-              <Icon name="x" size={16} />
-            </button>
-
-            <div style={{
-              width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px",
-              background: "var(--green-glow)", border: "1.5px solid var(--green-200)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-            }}>
-              <Icon name="mail" size={28} color="var(--green-600)" />
-            </div>
-
-            <h3 style={{
-              fontSize: 24, fontWeight: 800, letterSpacing: "-0.025em",
-              color: "var(--navy-800)", margin: "0 0 10px", lineHeight: 1.1,
-            }}>Where should we send your report?</h3>
-
-            <p style={{
-              fontSize: 15, lineHeight: 1.6, color: "var(--fg-2)", margin: "0 0 24px",
-            }}>
-              We&apos;ll email you access details and your PDF report.
-            </p>
-
-            <input
-              type="email"
-              value={userEmail}
-              onChange={(e) => { setUserEmail(e.target.value); setEmailError(""); }}
-              onKeyDown={(e) => { if (e.key === "Enter") handleEmailSubmit(); }}
-              placeholder="your@email.com"
-              autoFocus
-              style={{
-                width: "100%", padding: "14px 16px", fontSize: 16,
-                border: `1.5px solid ${emailError ? "var(--danger)" : "var(--border)"}`,
-                borderRadius: 12, outline: "none", fontFamily: "inherit",
-                boxSizing: "border-box", marginBottom: emailError ? 8 : 14,
-                color: "var(--navy-800)", background: "#fff", textAlign: "center",
-              }}
-            />
-
-            {emailError && (
-              <p style={{
-                fontSize: 13, color: "var(--danger)", margin: "0 0 12px",
-                fontWeight: 500,
-              }}>{emailError}</p>
-            )}
-
-            <button
-              onClick={handleEmailSubmit}
-              disabled={!userEmail.trim()}
-              style={{
-                width: "100%", padding: "16px 24px",
-                background: isValidEmail(userEmail)
-                  ? "linear-gradient(135deg, #00d467 0%, #00a851 100%)"
-                  : "var(--bg-page)",
-                color: isValidEmail(userEmail) ? "#fff" : "var(--fg-3)",
-                border: isValidEmail(userEmail) ? "none" : "1.5px solid var(--border)",
-                borderRadius: 14,
-                cursor: userEmail.trim() ? "pointer" : "not-allowed",
-                fontFamily: "inherit", fontSize: 16, fontWeight: 700,
-                boxShadow: isValidEmail(userEmail) ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",
-                letterSpacing: "-0.01em", marginBottom: 12,
-                transition: "all 150ms var(--ease-out)",
-              }}
-            >
-              Continue to Payment →
-            </button>
-
-            <p style={{ fontSize: 13, color: "var(--fg-3)", margin: 0 }}>
-              One-time payment &middot; 30 days access &middot; 7-day guarantee
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* PDF upsell modal — shown when unpaid user clicks Export PDF */}
       {showPdfModal && (
