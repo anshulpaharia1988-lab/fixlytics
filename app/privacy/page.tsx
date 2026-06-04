@@ -2,41 +2,88 @@ import PageLayout from "@/components/PageLayout";
 
 const SECTIONS = [
   {
-    title: "What we collect",
-    body: "When you use Fixlytics, we temporarily process the URL you submit in order to run your audit. We do not store your URL beyond the duration of your session. If you purchase a full report, your payment is handled entirely by Razorpay - we never see or store your card details.",
+    title: "What We Collect",
+    items: [
+      "Website URLs you enter for auditing",
+      "Email address (when you sign in or make a payment)",
+      "Payment information — processed securely by Razorpay; we never store card details",
+      "Anonymous usage data via Google Analytics",
+      "Anonymized session recordings via Microsoft Clarity",
+    ],
   },
   {
-    title: "Payment data",
-    body: "All payments are processed by Razorpay, which is PCI DSS compliant. Fixlytics only receives confirmation of a successful payment - no card numbers, CVVs, or bank account details are shared with us.",
+    title: "How We Use Your Data",
+    items: [
+      "To run website audits and show you results",
+      "To send you your audit report via email",
+      "To restore your access on any device when you sign in",
+      "To improve our product based on anonymous usage patterns",
+    ],
   },
   {
-    title: "Cookies and local storage",
-    body: "We use browser localStorage to remember which URLs you have already paid for, so you don't need to pay again within 30 days. No tracking cookies are set. No third-party analytics are used.",
+    title: "What We Don't Do",
+    items: [
+      "We never sell your data to any third party",
+      "We never share your email with advertisers or partners",
+      "We never store your payment card details",
+    ],
   },
   {
-    title: "Third-party services",
-    body: "We use Google PageSpeed Insights API to retrieve performance data for your site. Your URL is sent to Google's API as part of this request. Please refer to Google's privacy policy for details on how they handle this data.",
+    title: "Data Storage",
+    items: [
+      "Email and payment records are stored in an encrypted database (Upstash Redis)",
+      "Audit results are stored temporarily in your browser via localStorage",
+      "Payment records are kept for 30 days — the duration of your report access",
+    ],
   },
   {
-    title: "Data retention",
-    body: "We do not maintain a database of user accounts or submitted URLs. Audit results are computed on the fly and not stored on our servers after your session ends.",
+    title: "Cookies & Analytics",
+    items: [
+      "Google Analytics — anonymous usage tracking (pages visited, session duration)",
+      "Microsoft Clarity — anonymized session recordings to understand usability",
+      "Session cookies for login, managed by NextAuth (no tracking cookies)",
+    ],
+  },
+  {
+    title: "Payment Security",
+    items: [
+      "All payments are processed by Razorpay, which is PCI DSS Level 1 compliant",
+      "We receive only a confirmation of a successful payment — never card numbers, CVVs, or bank details",
+    ],
+  },
+  {
+    title: "Your Rights",
+    items: [
+      "Request deletion of your data: email support@fixlytics.app",
+      "Unsubscribe from emails: reply to any email from us with 'Unsubscribe'",
+    ],
   },
   {
     title: "Contact",
-    body: "If you have any questions about this policy, email us at support@fixlytics.app. We respond within 24 hours.",
+    items: [
+      "Email: support@fixlytics.app",
+      "We respond within 24 hours, Monday to Friday",
+    ],
   },
 ];
 
 export default function PrivacyPage() {
   return (
     <PageLayout title="Privacy Policy">
-      {SECTIONS.map(({ title, body }) => (
-        <section key={title} style={{ marginBottom: 36 }}>
+      {SECTIONS.map(({ title, items }) => (
+        <section key={title} style={{ marginBottom: 40 }}>
           <h2 style={{
-            fontSize: 20, fontWeight: 700, marginTop: 32, marginBottom: 10,
+            fontSize: 20, fontWeight: 700, marginTop: 36, marginBottom: 12,
             color: "var(--navy-800)", letterSpacing: "-0.01em",
           }}>{title}</h2>
-          <p style={{ fontSize: 16, lineHeight: 1.7, color: "var(--fg-2)", marginBottom: 0 }}>{body}</p>
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {items.map((item) => (
+              <li key={item} style={{
+                fontSize: 16, lineHeight: 1.7, color: "var(--fg-2)",
+                marginBottom: 6,
+              }}>{item}</li>
+            ))}
+          </ul>
         </section>
       ))}
     </PageLayout>
