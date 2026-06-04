@@ -95,9 +95,9 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
 
             {/* Desktop nav links */}
             <div className="nav-links-desktop" style={{ display: "flex", alignItems: "center", gap: 0 }}>
-              <a href="#how" style={navLinkStyle}>How it works</a>
-              <a href="#pricing" style={navLinkStyle}>Pricing</a>
-              <a href="#faq" style={navLinkStyle}>FAQ</a>
+              <a href="/#how" style={navLinkStyle}>How it works</a>
+              <a href="/#pricing" style={navLinkStyle}>Pricing</a>
+              <a href="/#faq" style={navLinkStyle}>FAQ</a>
               <div style={{ width: 12 }} />
 
               {session?.user?.email ? (
@@ -221,9 +221,9 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
           display: "none", flexDirection: "column", padding: "8px 0 16px",
         }}>
           {[
-            { label: "How it works", href: "#how" },
-            { label: "Pricing",      href: "#pricing" },
-            { label: "FAQ",          href: "#faq" },
+            { label: "How it works", href: "/#how" },
+            { label: "Pricing",      href: "/#pricing" },
+            { label: "FAQ",          href: "/#faq" },
           ].map(({ label, href }) => (
             <a key={label} href={href} onClick={close} style={{
               display: "block", padding: "14px 20px",
