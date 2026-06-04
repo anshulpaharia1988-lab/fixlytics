@@ -28,7 +28,7 @@ export default function VerifyEmailPage() {
           We sent a magic link to your inbox.
         </p>
         <p style={{ fontSize: 15, color: "var(--fg-3)", lineHeight: 1.6, margin: "0 0 32px" }}>
-          Click the link in the email to sign in instantly — no password needed.
+          Click the link in the email to sign in instantly  - no password needed.
         </p>
 
         <div style={{

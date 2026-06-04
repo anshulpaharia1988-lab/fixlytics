@@ -396,7 +396,7 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
           </div>
         </div>
 
-        {/* Main column — blurred when locked */}
+        {/* Main column  - blurred when locked */}
         <div style={{
           flex: 1, padding: 26, minWidth: 0,
           filter: showFix ? "none" : "blur(6px)",
@@ -488,7 +488,7 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
         </div>
       </div>
 
-      {/* Lock overlay — hidden in print so all issues appear clean in the PDF */}
+      {/* Lock overlay  - hidden in print so all issues appear clean in the PDF */}
       {!showFix && (
         <div className="no-print" style={{
           position: "absolute", inset: 0, left: 90,
@@ -588,7 +588,7 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             fontSize: 17, color: "rgba(255,255,255,0.78)", lineHeight: 1.55,
             margin: "0 0 28px", maxWidth: 540, textWrap: "pretty",
           } as CSSProperties}>
-            2 fixes shown free. Unlock {lockedCount} more fix{lockedCount === 1 ? "" : "es"} — each with a copy-paste solution you can ship today.
+            2 fixes shown free. Unlock {lockedCount} more fix{lockedCount === 1 ? "" : "es"}  - each with a copy-paste solution you can ship today.
           </p>
 
           {/* Feature table */}
@@ -802,7 +802,7 @@ export default function ResultsPage({
   const [userEmail, setUserEmail] = useState("");
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [recoverEmail, setRecoverEmail] = useState("");
-  const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "not-found">("idle");
+  const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "found-need-login" | "not-found">("idle");
   // session must be declared before any useEffect that references it
   const { data: session } = useSession();
 
@@ -847,7 +847,7 @@ export default function ResultsPage({
     }
   }
 
-  // Actual Razorpay checkout — only called after email is confirmed
+  // Actual Razorpay checkout  - only called after email is confirmed
   async function runPayment() {
     const loaded = await loadRazorpayScript();
     if (!loaded) {
@@ -924,14 +924,20 @@ export default function ResultsPage({
       );
       const data = await res.json();
       if (data.paid) {
-        setRecoverStatus("found");
-        markAsPaid(url);
-        setUserEmail(recoverEmail);
-        setTimeout(() => {
-          setIsPaid(true);
-          setShowRecoverModal(false);
-          setRecoverStatus("idle");
-        }, 1200);
+        if (session?.user?.email) {
+          // Logged in — restore immediately
+          setRecoverStatus("found");
+          markAsPaid(url);
+          setUserEmail(recoverEmail);
+          setTimeout(() => {
+            setIsPaid(true);
+            setShowRecoverModal(false);
+            setRecoverStatus("idle");
+          }, 1200);
+        } else {
+          // Payment found but not logged in — prompt sign in
+          setRecoverStatus("found-need-login");
+        }
       } else {
         setRecoverStatus("not-found");
       }
@@ -965,7 +971,7 @@ export default function ResultsPage({
 
   return (
     <div className="results-container" style={{ background: "var(--bg-page)", minHeight: "100vh", overflowX: "hidden" }}>
-      {/* PDF-only header — hidden on screen, shown via @media print */}
+      {/* PDF-only header  - hidden on screen, shown via @media print */}
       <div className="pdf-header" style={{ display: "none", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
         <img
           src="/logo.png"
@@ -1257,13 +1263,39 @@ export default function ResultsPage({
 
             {recoverStatus === "not-found" && (
               <p style={{ fontSize: 13, color: "var(--danger)", marginBottom: 10 }}>
-                No payment found for this email + site. <a href="mailto:support@fixlytics.app" style={{ color: "var(--green-600)" }}>Contact support</a>
+                No payment found for this email + site.{" "}
+                <a href="mailto:support@fixlytics.app" style={{ color: "var(--green-600)" }}>Contact support</a>
               </p>
             )}
             {recoverStatus === "found" && (
               <p style={{ fontSize: 13, color: "var(--green-600)", fontWeight: 600, marginBottom: 10 }}>
                 ✓ Access restored! Loading your full report…
               </p>
+            )}
+            {recoverStatus === "found-need-login" && (
+              <div style={{
+                background: "var(--green-glow)", border: "1px solid var(--green-200)",
+                borderRadius: 12, padding: "14px 16px", marginBottom: 12, textAlign: "left",
+              }}>
+                <p style={{ fontSize: 13.5, color: "var(--navy-800)", margin: "0 0 10px", fontWeight: 600 }}>
+                  ✓ Payment found! Sign in to restore your access.
+                </p>
+                <button
+                  onClick={() => {
+                    setShowRecoverModal(false);
+                    signIn(undefined, { callbackUrl: `/?url=${encodeURIComponent(url)}&view=results` });
+                  }}
+                  style={{
+                    width: "100%", padding: "11px 16px", borderRadius: 10,
+                    background: "linear-gradient(135deg, #00d467, #00a851)",
+                    color: "#fff", border: 0, fontFamily: "inherit",
+                    fontSize: 14, fontWeight: 700, cursor: "pointer",
+                    boxShadow: "0 4px 12px -2px rgba(0,199,88,0.36)",
+                  }}
+                >
+                  Sign in to restore access →
+                </button>
+              </div>
             )}
 
             <button
@@ -1286,7 +1318,7 @@ export default function ResultsPage({
       )}
 
 
-      {/* PDF upsell modal — shown when unpaid user clicks Export PDF */}
+      {/* PDF upsell modal  - shown when unpaid user clicks Export PDF */}
       {showPdfModal && (
         <div
           onClick={() => setShowPdfModal(false)}
@@ -1365,6 +1397,26 @@ export default function ResultsPage({
           </div>
         </div>
       )}
+
+      <footer className="no-print" style={{
+        padding: "32px 0",
+        background: "var(--navy-900)",
+        color: "rgba(255,255,255,0.5)",
+        fontSize: 13.5,
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div className="pc-container" style={{
+          display: "flex", justifyContent: "space-between",
+          flexWrap: "wrap", gap: 12,
+        }}>
+          <span>© 2026 Fixlytics. All rights reserved.</span>
+          <span style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
+            <a href="/privacy" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Privacy</a>
+            <a href="/terms"   style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Terms</a>
+            <a href="/contact" style={{ color: "rgba(255,255,255,0.5)", textDecoration: "none" }}>Contact</a>
+          </span>
+        </div>
+      </footer>
     </div>
   );
 }

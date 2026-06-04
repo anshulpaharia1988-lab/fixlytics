@@ -1131,7 +1131,7 @@ export default function LandingPage({
             fontSize: 14, color: "var(--fg-3)", fontWeight: 500,
             letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 16,
           }}>
-            Early access — join site owners already improving their scores
+            Early access  - join site owners already improving their scores
           </p>
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 32, flexWrap: "wrap" }}>
             {["Free audit", "No signup", "90 sec scan", "Real data", "AI fixes"].map((tag) => (

@@ -4,6 +4,10 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
+function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,7 +17,7 @@ function LoginForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
       setError("Please enter a valid email address");
       return;
     }
@@ -73,14 +77,14 @@ function LoginForm() {
           </p>
           <button
             type="submit"
-            disabled={loading || !email.trim()}
+            disabled={loading || !isValidEmail(email)}
             style={{
               width: "100%", padding: "15px 24px",
-              background: email.trim() && !loading
+              background: isValidEmail(email) && !loading
                 ? "linear-gradient(135deg, #00d467, #00a851)"
                 : "var(--bg-page)",
-              color: email.trim() && !loading ? "#fff" : "var(--fg-3)",
-              border: email.trim() && !loading ? "none" : "1.5px solid var(--border)",
+              color: isValidEmail(email) && !loading ? "#fff" : "var(--fg-3)",
+              border: isValidEmail(email) && !loading ? "none" : "1.5px solid var(--border)",
               borderRadius: 14, cursor: loading ? "wait" : "pointer",
               fontFamily: "inherit", fontSize: 16, fontWeight: 700,
               boxShadow: email.trim() && !loading ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",

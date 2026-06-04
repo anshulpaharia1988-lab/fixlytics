@@ -109,14 +109,14 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
               )}
             </div>
 
-            {/* Audit button — always visible on desktop */}
+            {/* Audit button  - always visible on desktop */}
             <span className="nav-audit-desktop">
               <Button kind="primary" size="sm" iconRight="arrow-right" onClick={handleAuditClick}>
                 Audit new site
               </Button>
             </span>
 
-            {/* Hamburger — mobile only */}
+            {/* Hamburger  - mobile only */}
             <button
               className="nav-hamburger"
               onClick={() => setMobileMenuOpen((o) => !o)}
