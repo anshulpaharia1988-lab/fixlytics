@@ -101,27 +101,41 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
               <div style={{ width: 12 }} />
 
               {session?.user?.email ? (
-                /* Logged in — email button opens dropdown */
+                /* Logged in — avatar + email button opens dropdown */
                 <div ref={dropdownRef} style={{ position: "relative" }}>
                   <button
                     onClick={() => setDropdownOpen((o) => !o)}
                     style={{
-                      background: "none", border: "1px solid var(--border)",
-                      borderRadius: 8, padding: "7px 12px", cursor: "pointer",
-                      fontFamily: "inherit", fontSize: 13.5, fontWeight: 500,
-                      color: "var(--navy-800)", display: "flex", alignItems: "center", gap: 6,
-                      maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                      background: "none", border: "none", cursor: "pointer",
+                      display: "flex", alignItems: "center", gap: 6,
+                      fontSize: 14, color: "var(--fg-2)", fontFamily: "inherit",
+                      padding: "6px 10px", borderRadius: 8,
                     }}
                   >
-                    {session.user.email}
-                    <span style={{ fontSize: 10, opacity: 0.6 }}>▾</span>
+                    <span style={{
+                      width: 28, height: 28, borderRadius: "50%",
+                      background: "var(--green-100)", color: "var(--green-700)",
+                      display: "inline-flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 12, fontWeight: 700, flexShrink: 0,
+                    }}>
+                      {session.user.email?.[0].toUpperCase()}
+                    </span>
+                    <span style={{ maxWidth: 140, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {session.user.email}
+                    </span>
+                    <span style={{
+                      fontSize: 10, color: "var(--fg-3)",
+                      transform: dropdownOpen ? "rotate(180deg)" : "rotate(0deg)",
+                      transition: "transform 200ms",
+                      display: "inline-block",
+                    }}>▼</span>
                   </button>
 
                   {dropdownOpen && (
                     <div style={{
                       position: "absolute", top: "calc(100% + 8px)", right: 0,
                       background: "#fff", border: "1px solid var(--border)",
-                      borderRadius: 14, padding: 6, minWidth: 210,
+                      borderRadius: 12, padding: 6, minWidth: 180,
                       boxShadow: "0 16px 40px -8px rgba(10,22,40,0.18)",
                       zIndex: 100,
                     }}>
@@ -130,29 +144,29 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
                         onClick={() => setDropdownOpen(false)}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          padding: "10px 14px", borderRadius: 9,
+                          padding: "10px 14px", borderRadius: 8,
                           color: "var(--navy-800)", textDecoration: "none",
                           fontSize: 14, fontWeight: 500,
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-page)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
-                        <span style={{ fontSize: 16 }}>📊</span> My Reports
+                        My Reports
                       </a>
                       <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
                       <button
                         onClick={() => { setDropdownOpen(false); doSignOut(); }}
                         style={{
                           display: "flex", alignItems: "center", gap: 10,
-                          width: "100%", padding: "10px 14px", borderRadius: 9,
+                          width: "100%", padding: "10px 14px", borderRadius: 8,
                           background: "none", border: 0, cursor: "pointer",
                           color: "var(--danger)", fontFamily: "inherit", fontSize: 14, fontWeight: 500,
                           textAlign: "left",
                         }}
-                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-page)")}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--danger-bg)")}
                         onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                       >
-                        <span style={{ fontSize: 16 }}>🚪</span> Sign out
+                        Sign out
                       </button>
                     </div>
                   )}
