@@ -72,7 +72,7 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
             aria-label="Fixlytics home"
           >
             <img src="/logo.png" alt="Fixlytics" width={160}
-              style={{ height: "auto", display: "block" }}
+              style={{ height: "auto", display: "block", background: "#fff", borderRadius: 6, padding: 2 }}
               onError={(e) => {
                 const img = e.currentTarget;
                 img.style.display = "none";
