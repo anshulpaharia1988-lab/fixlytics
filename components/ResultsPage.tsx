@@ -197,8 +197,12 @@ function VerdictCard({ overallScore, criticalCount, freeCount, premiumCount }: {
           <VerdictStat icon="alert-octagon" color="var(--danger)" value={criticalCount} label="Critical issues" sub="Fix these first" />
           <div style={{ width: 1, alignSelf: "stretch", background: "var(--border)" }} />
           <VerdictStat icon="wand-2" color="var(--green-600)" value={freeCount} label="Free fixes ready" sub="Copy-paste in minutes" />
-          <div style={{ width: 1, alignSelf: "stretch", background: "var(--border)" }} />
-          <VerdictStat icon="lock" color="var(--navy-700)" value={`+${premiumCount}`} label="Locked in premium" sub="Worth the upgrade" />
+          {premiumCount > 0 && (
+            <>
+              <div style={{ width: 1, alignSelf: "stretch", background: "var(--border)" }} />
+              <VerdictStat icon="lock" color="var(--navy-700)" value={`+${premiumCount}`} label="Locked in premium" sub="Worth the upgrade" />
+            </>
+          )}
         </div>
 
         {/* Revenue callout */}
