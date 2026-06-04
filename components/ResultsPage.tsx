@@ -1,5 +1,6 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import type { CSSProperties, ReactNode } from "react";
 import Button from "./Button";
 import Icon from "./Icon";
@@ -897,12 +898,20 @@ export default function ResultsPage({
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   }
 
-  // Entry point for ALL unlock actions — always shows email modal first.
-  // Email must be validated before Razorpay opens; there is no skip path.
+  // Entry point for ALL unlock actions.
+  // If the user is signed in, use their session email and skip the modal.
+  // Otherwise show the mandatory email modal.
   function handleUnlock() {
-    setUserEmail("");
-    setEmailError("");
-    setShowEmailModal(true);
+    const sessionEmail = session?.user?.email;
+    if (sessionEmail) {
+      setUserEmail(sessionEmail);
+      setEmailError("");
+      runPayment();
+    } else {
+      setUserEmail("");
+      setEmailError("");
+      setShowEmailModal(true);
+    }
   }
 
   function handleEmailSubmit() {
@@ -956,6 +965,8 @@ export default function ResultsPage({
     () => issues.filter((i) => activeArea === "all" || i.area === activeArea),
     [activeArea, issues]
   );
+
+  const { data: session } = useSession();
 
   const criticalCount = issues.filter((i) => i.severity === "high").length;
   const overallScore  = Math.round((scores.ux.value + scores.seo.value + scores.speed.value) / 3);

@@ -1,4 +1,5 @@
 "use client";
+import { useSession, signOut } from "next-auth/react";
 import Button from "./Button";
 
 interface TopNavProps {
@@ -17,6 +18,8 @@ const navLinkStyle: React.CSSProperties = {
 };
 
 export default function TopNav({ onLogo, onAudit, brand = "Fixlytics" }: TopNavProps) {
+  const { data: session } = useSession();
+
   return (
     <nav
       style={{
@@ -57,7 +60,6 @@ export default function TopNav({ onLogo, onAudit, brand = "Fixlytics" }: TopNavP
               if (fallback) fallback.style.display = "inline-flex";
             }}
           />
-          {/* Div fallback if logo.png is missing */}
           <div style={{
             width: 28, height: 28, borderRadius: 8,
             background: "linear-gradient(135deg, var(--navy-700) 0%, var(--navy-800) 100%)",
@@ -76,13 +78,25 @@ export default function TopNav({ onLogo, onAudit, brand = "Fixlytics" }: TopNavP
             <a href="#pricing" style={navLinkStyle}>Pricing</a>
             <a href="#faq" style={navLinkStyle}>FAQ</a>
             <div style={{ width: 12 }} />
-            <Button
-              kind="ghostLight"
-              size="sm"
-              onClick={() => document.getElementById("faq")?.scrollIntoView({ behavior: "smooth" })}
-            >
-              Sign in
-            </Button>
+
+            {session?.user?.email ? (
+              <>
+                <span style={{
+                  fontSize: 13.5, color: "var(--fg-2)", fontWeight: 500,
+                  padding: "8px 12px", maxWidth: 180,
+                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                }}>
+                  {session.user.email}
+                </span>
+                <Button kind="ghostLight" size="sm" onClick={() => signOut({ callbackUrl: "/" })}>
+                  Sign out
+                </Button>
+              </>
+            ) : (
+              <Button kind="ghostLight" size="sm" onClick={() => window.location.href = "/login"}>
+                Sign in
+              </Button>
+            )}
           </div>
 
           {/* Always visible */}

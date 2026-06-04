@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
+import SessionWrapper from "@/components/SessionWrapper";
 import "./globals.css";
 
 const geist = Geist({
@@ -73,7 +74,9 @@ export default function RootLayout({
         )}
       </head>
       <body>
-        {children}
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
         <Script src="https://unpkg.com/lucide@latest" strategy="lazyOnload" />
       </body>
     </html>
