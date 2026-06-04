@@ -908,7 +908,7 @@ export default function ResultsPage({
   function handleUnlock() {
     const sessionEmail = session?.user?.email;
     if (!sessionEmail) {
-      signIn(undefined, { callbackUrl: window.location.href });
+      signIn(undefined, { callbackUrl: `/?url=${encodeURIComponent(url)}&view=results` });
       return;
     }
     setUserEmail(sessionEmail);

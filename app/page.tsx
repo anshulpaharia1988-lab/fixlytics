@@ -8,12 +8,14 @@ import { isPaid } from "@/lib/paymentStorage";
 
 const KEY_URL  = "fixlytics_last_url";
 const KEY_DATA = "fixlytics_last_data";
+const KEY_VIEW = "fixlytics_last_view";
 
 type View = "landing" | "scan" | "results";
 
 function saveSession(url: string, data: AuditData | null) {
   try {
     sessionStorage.setItem(KEY_URL, url);
+    sessionStorage.setItem(KEY_VIEW, "results");
     if (data) sessionStorage.setItem(KEY_DATA, JSON.stringify(data));
     else sessionStorage.removeItem(KEY_DATA);
   } catch { /* private browsing */ }
@@ -23,6 +25,7 @@ function clearSession() {
   try {
     sessionStorage.removeItem(KEY_URL);
     sessionStorage.removeItem(KEY_DATA);
+    sessionStorage.removeItem(KEY_VIEW);
   } catch { /* ignore */ }
 }
 
@@ -32,32 +35,47 @@ export default function Home() {
   const [auditData, setAuditData] = useState<AuditData | null>(null);
   const [urlIsPaid, setUrlIsPaid] = useState(false);
 
-  // On mount: restore last session from sessionStorage.
-  // mounted guard prevents state updates from racing with HMR unmount/remount.
   useEffect(() => {
     let mounted = true;
+
+    // Priority 1: URL params — set after magic-link login callback
+    // /?url=https://site.com&view=results → go straight to results
     try {
-      const savedUrl = sessionStorage.getItem(KEY_URL);
-      if (!savedUrl || !mounted) return;
+      const params = new URLSearchParams(window.location.search);
+      const urlParam  = params.get("url");
+      const viewParam = params.get("view");
+      if (urlParam && viewParam === "results" && mounted) {
+        setUrl(urlParam);
+        setUrlIsPaid(isPaid(urlParam));
+        setView("results");
+        // Persist so a refresh stays on results
+        saveSession(urlParam, null);
+        // Clean up the query string without a full navigation
+        window.history.replaceState({}, "", "/");
+        return () => { mounted = false; };
+      }
+    } catch { /* ignore */ }
 
-      const paid = isPaid(savedUrl);
-      if (!mounted) return;
-
-      setUrl(savedUrl);
-      setUrlIsPaid(paid);
-
-      if (paid) {
-        const raw = sessionStorage.getItem(KEY_DATA);
+    // Priority 2: sessionStorage — refresh while on results page
+    try {
+      const savedUrl  = sessionStorage.getItem(KEY_URL);
+      const savedView = sessionStorage.getItem(KEY_VIEW);
+      if (savedUrl && savedView === "results" && mounted) {
+        const raw    = sessionStorage.getItem(KEY_DATA);
         const cached: AuditData | null = raw ? JSON.parse(raw) : null;
-        if (mounted) { setAuditData(cached); setView("results"); }
-      } else {
-        if (mounted) setView("scan");
+        setUrl(savedUrl);
+        setUrlIsPaid(isPaid(savedUrl));
+        setAuditData(cached);
+        setView("results");
+        return () => { mounted = false; };
       }
     } catch { /* sessionStorage unavailable */ }
+
     return () => { mounted = false; };
   }, []);
 
   function handleAudit(targetUrl: string) {
+    clearSession();
     setUrl(targetUrl);
     setAuditData(null);
     setUrlIsPaid(isPaid(targetUrl));
@@ -65,6 +83,7 @@ export default function Home() {
   }
 
   function handleRerun() {
+    clearSession();
     setAuditData(null);
     setUrlIsPaid(isPaid(url));
     setView("scan");
