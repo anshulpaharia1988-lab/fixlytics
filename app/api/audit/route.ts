@@ -43,20 +43,42 @@ export async function GET(request: NextRequest) {
         .then((r) => (r.ok ? r.text() : null))
         .catch(() => null);
 
-      // PageSpeed: try mobile first (45s), then retry with desktop.
+      // PageSpeed: try mobile first (60s), then retry with desktop (usually faster).
       const psBase = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(targetUrl)}&key=${encodeURIComponent(apiKey)}`;
       let psResponse: Response | null = null;
+      const psStart = Date.now();
+
+      console.log("[PageSpeed] Starting request for:", targetUrl);
 
       try {
-        const r = await fetch(`${psBase}&strategy=mobile`, { signal: AbortSignal.timeout(45_000) });
-        if (r.ok) psResponse = r;
-      } catch { /* mobile timed out or failed */ }
+        const r = await fetch(`${psBase}&strategy=mobile`, { signal: AbortSignal.timeout(60_000) });
+        if (r.ok) {
+          psResponse = r;
+          console.log("[PageSpeed] Mobile succeeded in", Date.now() - psStart, "ms");
+        } else {
+          console.log("[PageSpeed] Mobile returned HTTP", r.status);
+        }
+      } catch (e) {
+        console.log("[PageSpeed] Mobile timed out / failed after", Date.now() - psStart, "ms:", String(e));
+      }
 
       if (!psResponse) {
+        const desktopStart = Date.now();
         try {
-          const r = await fetch(`${psBase}&strategy=desktop`, { signal: AbortSignal.timeout(45_000) });
-          if (r.ok) psResponse = r;
-        } catch { /* desktop also failed */ }
+          const r = await fetch(`${psBase}&strategy=desktop`, { signal: AbortSignal.timeout(60_000) });
+          if (r.ok) {
+            psResponse = r;
+            console.log("[PageSpeed] Desktop succeeded in", Date.now() - desktopStart, "ms");
+          } else {
+            console.log("[PageSpeed] Desktop returned HTTP", r.status);
+          }
+        } catch (e) {
+          console.log("[PageSpeed] Desktop timed out / failed after", Date.now() - desktopStart, "ms:", String(e));
+        }
+      }
+
+      if (!psResponse) {
+        console.log("[PageSpeed] Both strategies failed — falling back to deterministic. Total:", Date.now() - psStart, "ms");
       }
 
       // htmlFetchPromise resolves to the full HTML string (or null if failed/blocked).
@@ -178,6 +200,7 @@ export async function GET(request: NextRequest) {
           ? [...speedIssues, ...nonSpeedIssues]
           : getDynamicIssues(realScores, url, realSEO);
 
+        console.log("[PageSpeed] Source: pagespeed, score:", perfScore, "fcp:", fcp);
         return Response.json({
           scores: realScores,
           issues: allIssues,
