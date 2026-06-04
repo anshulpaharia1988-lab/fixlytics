@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
                 <strong>Access is valid for 30 days</strong> on the same browser.
                 Use "Already paid?" on any device to restore access with your email.
               </p>
-              <a href="https://fixlytics.vercel.app"
+              <a href="https://fixlytics.app"
                  style="display: inline-block; background: #00c758; color: #fff;
                         padding: 14px 28px; border-radius: 10px; text-decoration: none;
                         font-weight: 700; font-size: 16px; margin-bottom: 28px;">
