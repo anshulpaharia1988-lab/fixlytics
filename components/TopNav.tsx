@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Button from "./Button";
 
@@ -18,45 +18,52 @@ const navLinkStyle: React.CSSProperties = {
   borderRadius: 8,
 };
 
-function handleSignOut() {
+function doSignOut() {
   try { localStorage.removeItem("fixlytics_paid_reports"); } catch { /* ignore */ }
-  handleSignOut();
+  signOut({ callbackUrl: "/" });
 }
 
 export default function TopNav({ onLogo, onAudit }: TopNavProps) {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   function close() { setMobileMenuOpen(false); }
 
   function handleLogoClick() {
-    close();
+    close(); setDropdownOpen(false);
     onAudit ? onAudit() : window.scrollTo({ top: 0, behavior: "smooth" });
     onLogo?.();
   }
 
   function handleAuditClick() {
-    close();
+    close(); setDropdownOpen(false);
     onAudit ? onAudit() : window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
     <>
-      <nav
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          background: "rgba(255,255,255,0.92)",
-          backdropFilter: "blur(20px) saturate(180%)",
-          WebkitBackdropFilter: "blur(20px) saturate(180%)",
-          borderBottom: "1px solid rgba(10,22,40,0.06)",
-        }}
-      >
-        <div
-          className="pc-container"
-          style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}
-        >
+      <nav style={{
+        position: "sticky", top: 0, zIndex: 50,
+        background: "rgba(255,255,255,0.92)",
+        backdropFilter: "blur(20px) saturate(180%)",
+        WebkitBackdropFilter: "blur(20px) saturate(180%)",
+        borderBottom: "1px solid rgba(10,22,40,0.06)",
+      }}>
+        <div className="pc-container" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", height: 72 }}>
+
           {/* Logo */}
           <button
             onClick={handleLogoClick}
@@ -64,10 +71,7 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
             style={{ background: "none", border: 0, cursor: "pointer", padding: 0 }}
             aria-label="Fixlytics home"
           >
-            <img
-              src="/logo.png"
-              alt="Fixlytics"
-              width={160}
+            <img src="/logo.png" alt="Fixlytics" width={160}
               style={{ height: "auto", display: "block" }}
               onError={(e) => {
                 const img = e.currentTarget;
@@ -88,25 +92,71 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
 
           {/* Right side */}
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            {/* Desktop nav links + auth */}
+
+            {/* Desktop nav links */}
             <div className="nav-links-desktop" style={{ display: "flex", alignItems: "center", gap: 0 }}>
               <a href="#how" style={navLinkStyle}>How it works</a>
               <a href="#pricing" style={navLinkStyle}>Pricing</a>
               <a href="#faq" style={navLinkStyle}>FAQ</a>
               <div style={{ width: 12 }} />
+
               {session?.user?.email ? (
-                <>
-                  <span style={{
-                    fontSize: 13.5, color: "var(--fg-2)", fontWeight: 500,
-                    padding: "8px 12px", maxWidth: 180,
-                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                  }}>
+                /* Logged in — email button opens dropdown */
+                <div ref={dropdownRef} style={{ position: "relative" }}>
+                  <button
+                    onClick={() => setDropdownOpen((o) => !o)}
+                    style={{
+                      background: "none", border: "1px solid var(--border)",
+                      borderRadius: 8, padding: "7px 12px", cursor: "pointer",
+                      fontFamily: "inherit", fontSize: 13.5, fontWeight: 500,
+                      color: "var(--navy-800)", display: "flex", alignItems: "center", gap: 6,
+                      maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+                    }}
+                  >
                     {session.user.email}
-                  </span>
-                  <Button kind="ghostLight" size="sm" onClick={() => handleSignOut()}>
-                    Sign out
-                  </Button>
-                </>
+                    <span style={{ fontSize: 10, opacity: 0.6 }}>▾</span>
+                  </button>
+
+                  {dropdownOpen && (
+                    <div style={{
+                      position: "absolute", top: "calc(100% + 8px)", right: 0,
+                      background: "#fff", border: "1px solid var(--border)",
+                      borderRadius: 14, padding: 6, minWidth: 210,
+                      boxShadow: "0 16px 40px -8px rgba(10,22,40,0.18)",
+                      zIndex: 100,
+                    }}>
+                      <a
+                        href="/my-reports"
+                        onClick={() => setDropdownOpen(false)}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          padding: "10px 14px", borderRadius: 9,
+                          color: "var(--navy-800)", textDecoration: "none",
+                          fontSize: 14, fontWeight: 500,
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-page)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span style={{ fontSize: 16 }}>📊</span> My Reports
+                      </a>
+                      <div style={{ height: 1, background: "var(--border)", margin: "4px 0" }} />
+                      <button
+                        onClick={() => { setDropdownOpen(false); doSignOut(); }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 10,
+                          width: "100%", padding: "10px 14px", borderRadius: 9,
+                          background: "none", border: 0, cursor: "pointer",
+                          color: "var(--danger)", fontFamily: "inherit", fontSize: 14, fontWeight: 500,
+                          textAlign: "left",
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = "var(--bg-page)")}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                      >
+                        <span style={{ fontSize: 16 }}>🚪</span> Sign out
+                      </button>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Button kind="ghostLight" size="sm" onClick={() => window.location.href = "/login"}>
                   Sign in
@@ -114,32 +164,31 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
               )}
             </div>
 
-            {/* Audit button  - always visible on desktop */}
+            {/* Audit button - desktop */}
             <span className="nav-audit-desktop">
               <Button kind="primary" size="sm" iconRight="arrow-right" onClick={handleAuditClick}>
-                Audit new site
+                <span className="btn-text-full">Audit new site</span>
+                <span className="btn-text-short" style={{ display: "none" }}>Audit</span>
               </Button>
             </span>
 
-            {/* Hamburger  - mobile only */}
+            {/* Hamburger - mobile only */}
             <button
               className="nav-hamburger"
               onClick={() => setMobileMenuOpen((o) => !o)}
               aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
               style={{
-                display: "none", /* shown via CSS on mobile */
+                display: "none",
                 background: "none", border: 0, cursor: "pointer",
                 padding: "8px", borderRadius: 8, flexDirection: "column",
                 gap: 5, alignItems: "center", justifyContent: "center",
               }}
             >
               {mobileMenuOpen ? (
-                /* X icon */
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M4 4L16 16M16 4L4 16" stroke="var(--navy-800)" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
               ) : (
-                /* ☰ icon */
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                   <path d="M3 5h14M3 10h14M3 15h14" stroke="var(--navy-800)" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
@@ -151,101 +200,74 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
 
       {/* Mobile dropdown menu */}
       {mobileMenuOpen && (
-        <div
-          className="nav-mobile-menu"
-          style={{
-            position: "fixed", top: 72, left: 0, right: 0, zIndex: 49,
-            background: "#fff",
-            borderBottom: "1px solid var(--border)",
-            boxShadow: "0 8px 24px -4px rgba(10,22,40,0.12)",
-            display: "none", /* shown via CSS on mobile */
-            flexDirection: "column",
-            padding: "8px 0 16px",
-          }}
-        >
+        <div className="nav-mobile-menu" style={{
+          position: "fixed", top: 72, left: 0, right: 0, zIndex: 49,
+          background: "#fff", borderBottom: "1px solid var(--border)",
+          boxShadow: "0 8px 24px -4px rgba(10,22,40,0.12)",
+          display: "none", flexDirection: "column", padding: "8px 0 16px",
+        }}>
           {[
             { label: "How it works", href: "#how" },
-            { label: "Pricing",       href: "#pricing" },
-            { label: "FAQ",            href: "#faq" },
+            { label: "Pricing",      href: "#pricing" },
+            { label: "FAQ",          href: "#faq" },
           ].map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              onClick={close}
-              style={{
-                display: "block", padding: "14px 20px",
-                fontSize: 16, fontWeight: 500,
-                color: "var(--navy-800)", textDecoration: "none",
-                borderBottom: "1px solid var(--border)",
-              }}
-            >
-              {label}
-            </a>
+            <a key={label} href={href} onClick={close} style={{
+              display: "block", padding: "14px 20px",
+              fontSize: 16, fontWeight: 500,
+              color: "var(--navy-800)", textDecoration: "none",
+              borderBottom: "1px solid var(--border)",
+            }}>{label}</a>
           ))}
+
+          {session?.user?.email && (
+            <a href="/my-reports" onClick={close} style={{
+              display: "block", padding: "14px 20px",
+              fontSize: 16, fontWeight: 500,
+              color: "var(--navy-800)", textDecoration: "none",
+              borderBottom: "1px solid var(--border)",
+            }}>
+              📊 My Reports
+            </a>
+          )}
 
           <div style={{ padding: "12px 20px 0" }}>
             {session?.user?.email ? (
               <>
-                <div style={{
-                  fontSize: 13, color: "var(--fg-3)", marginBottom: 10,
-                  overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
-                }}>
+                <div style={{ fontSize: 13, color: "var(--fg-3)", marginBottom: 10, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   Signed in as <strong style={{ color: "var(--navy-800)" }}>{session.user.email}</strong>
                 </div>
-                <button
-                  onClick={() => { close(); handleSignOut(); }}
-                  style={{
-                    width: "100%", padding: "12px 16px", borderRadius: 10,
-                    background: "var(--bg-page)", border: "1px solid var(--border)",
-                    fontSize: 15, fontWeight: 600, color: "var(--navy-800)",
-                    cursor: "pointer", fontFamily: "inherit", textAlign: "left",
-                    marginBottom: 10,
-                  }}
-                >
-                  Sign out
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => { close(); window.location.href = "/login"; }}
-                style={{
+                <button onClick={() => { close(); doSignOut(); }} style={{
                   width: "100%", padding: "12px 16px", borderRadius: 10,
                   background: "var(--bg-page)", border: "1px solid var(--border)",
-                  fontSize: 15, fontWeight: 600, color: "var(--navy-800)",
-                  cursor: "pointer", fontFamily: "inherit", textAlign: "left",
-                  marginBottom: 10,
-                }}
-              >
-                Sign in
-              </button>
+                  fontSize: 15, fontWeight: 600, color: "var(--danger)",
+                  cursor: "pointer", fontFamily: "inherit", textAlign: "left", marginBottom: 10,
+                }}>Sign out</button>
+              </>
+            ) : (
+              <button onClick={() => { close(); window.location.href = "/login"; }} style={{
+                width: "100%", padding: "12px 16px", borderRadius: 10,
+                background: "var(--bg-page)", border: "1px solid var(--border)",
+                fontSize: 15, fontWeight: 600, color: "var(--navy-800)",
+                cursor: "pointer", fontFamily: "inherit", textAlign: "left", marginBottom: 10,
+              }}>Sign in</button>
             )}
-            <button
-              onClick={handleAuditClick}
-              style={{
-                width: "100%", padding: "13px 16px", borderRadius: 10,
-                background: "linear-gradient(135deg, #00d467, #00a851)",
-                color: "#fff", border: 0,
-                fontSize: 15, fontWeight: 700,
-                cursor: "pointer", fontFamily: "inherit",
-                boxShadow: "0 4px 16px -4px rgba(0,199,88,0.40)",
-              }}
-            >
+            <button onClick={handleAuditClick} style={{
+              width: "100%", padding: "13px 16px", borderRadius: 10,
+              background: "linear-gradient(135deg, #00d467, #00a851)",
+              color: "#fff", border: 0, fontSize: 15, fontWeight: 700,
+              cursor: "pointer", fontFamily: "inherit",
+              boxShadow: "0 4px 16px -4px rgba(0,199,88,0.40)",
+            }}>
               Audit new site →
             </button>
           </div>
         </div>
       )}
 
-      {/* Overlay to close menu when clicking outside */}
       {mobileMenuOpen && (
-        <div
-          onClick={close}
-          style={{
-            position: "fixed", inset: 0, zIndex: 48,
-            display: "none", /* shown via CSS on mobile */
-          }}
-          className="nav-mobile-overlay"
-        />
+        <div onClick={close} className="nav-mobile-overlay" style={{
+          position: "fixed", inset: 0, zIndex: 48, display: "none",
+        }} />
       )}
     </>
   );
