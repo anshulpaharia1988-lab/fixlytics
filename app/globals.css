@@ -245,8 +245,12 @@ h3, .h3 {
 @media (max-width: 768px) {
   .pc-container { padding: 0 16px !important; }
 
-  /* TopNav: hide desktop nav links */
+  /* TopNav: hide desktop links, show hamburger + mobile menu */
   .nav-links-desktop { display: none !important; }
+  .nav-audit-desktop { display: none !important; }
+  .nav-hamburger { display: flex !important; }
+  .nav-mobile-menu { display: flex !important; }
+  .nav-mobile-overlay { display: block !important; }
 
   /* Hero: hide product preview mockup */
   .hide-mobile { display: none !important; }
