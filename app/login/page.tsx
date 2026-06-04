@@ -5,7 +5,24 @@ import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 
 function isValidEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email)) return false;
+
+  const parts = email.split("@");
+  if (parts.length !== 2) return false;
+
+  const domain = parts[1];
+  const domainParts = domain.split(".");
+  if (domainParts.length < 2) return false;
+
+  const tld = domainParts[domainParts.length - 1];
+  if (tld.length < 2) return false;
+
+  // Block random-consonant domains (no vowels in domain name when length > 4)
+  const domainName = domainParts[0];
+  if (domainName.length > 4 && !/[aeiou]/i.test(domainName)) return false;
+
+  return true;
 }
 
 function LoginForm() {
