@@ -848,11 +848,15 @@ export default function ResultsPage({
   }
 
   function handleExportPdf() {
-    if (isPaid) {
-      window.print();
-    } else {
-      setShowPdfModal(true);
+    if (!session) {
+      signIn(undefined, { callbackUrl: `/?url=${encodeURIComponent(url)}&view=results` });
+      return;
     }
+    if (!isPaid) {
+      document.getElementById("paywall-section")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    window.print();
   }
 
   // Actual Razorpay checkout  - only called after email is confirmed
@@ -1064,13 +1068,11 @@ export default function ResultsPage({
               <Button kind="ghostDark" size="md" icon="share-2" onClick={handleShare}>
                 <span className="btn-text-desktop">Share</span>
               </Button>
-              {isPaid && !!session && (
-                <span className="no-print">
-                  <Button kind="primary" size="md" icon="download" onClick={handleExportPdf}>
-                    <span className="btn-text-desktop">Export PDF</span>
-                  </Button>
-                </span>
-              )}
+              <span className="no-print">
+                <Button kind="primary" size="md" icon="download" onClick={handleExportPdf}>
+                  <span className="btn-text-desktop">Export PDF</span>
+                </Button>
+              </span>
             </div>
           </div>
         </div>
@@ -1180,7 +1182,7 @@ export default function ResultsPage({
 
       {/* Locked premium */}
       {!isPaid && (
-        <section className="paywall-section no-print" style={{ padding: "24px 0 48px" }}>
+        <section id="paywall-section" className="paywall-section no-print" style={{ padding: "24px 0 48px" }}>
           <div className="pc-container">
             <LockedPremiumPanel
               currency={currency}
