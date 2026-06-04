@@ -18,6 +18,11 @@ const navLinkStyle: React.CSSProperties = {
   borderRadius: 8,
 };
 
+function handleSignOut() {
+  try { localStorage.removeItem("fixlytics_paid_reports"); } catch { /* ignore */ }
+  handleSignOut();
+}
+
 export default function TopNav({ onLogo, onAudit }: TopNavProps) {
   const { data: session } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -98,7 +103,7 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
                   }}>
                     {session.user.email}
                   </span>
-                  <Button kind="ghostLight" size="sm" onClick={() => signOut({ callbackUrl: "/" })}>
+                  <Button kind="ghostLight" size="sm" onClick={() => handleSignOut()}>
                     Sign out
                   </Button>
                 </>
@@ -188,7 +193,7 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
                   Signed in as <strong style={{ color: "var(--navy-800)" }}>{session.user.email}</strong>
                 </div>
                 <button
-                  onClick={() => { close(); signOut({ callbackUrl: "/" }); }}
+                  onClick={() => { close(); handleSignOut(); }}
                   style={{
                     width: "100%", padding: "12px 16px", borderRadius: 10,
                     background: "var(--bg-page)", border: "1px solid var(--border)",

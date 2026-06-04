@@ -824,6 +824,14 @@ export default function ResultsPage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email, url]);
 
+  // When session is cleared (sign-out), revoke localStorage-based paid state
+  useEffect(() => {
+    if (session === null && isPaid) {
+      setIsPaid(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session]);
+
   function handleRerun() {
     if (onRerun) onRerun();
   }
@@ -1056,11 +1064,13 @@ export default function ResultsPage({
               <Button kind="ghostDark" size="md" icon="share-2" onClick={handleShare}>
                 <span className="btn-text-desktop">Share</span>
               </Button>
-              <span className="no-print">
-                <Button kind="primary" size="md" icon="download" onClick={handleExportPdf}>
-                  <span className="btn-text-desktop">Export PDF</span>
-                </Button>
-              </span>
+              {isPaid && !!session && (
+                <span className="no-print">
+                  <Button kind="primary" size="md" icon="download" onClick={handleExportPdf}>
+                    <span className="btn-text-desktop">Export PDF</span>
+                  </Button>
+                </span>
+              )}
             </div>
           </div>
         </div>
