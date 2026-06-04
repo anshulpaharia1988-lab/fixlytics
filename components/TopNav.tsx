@@ -29,6 +29,19 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  function handleNavClick(sectionId: string) {
+    close();
+    if (onAudit) {
+      // SPA: go to landing first, then scroll after React re-renders
+      onAudit();
+      setTimeout(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+      }, 350);
+    } else {
+      document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+    }
+  }
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -95,9 +108,9 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
 
             {/* Desktop nav links */}
             <div className="nav-links-desktop" style={{ display: "flex", alignItems: "center", gap: 0 }}>
-              <a href="/#how" style={navLinkStyle}>How it works</a>
-              <a href="/#pricing" style={navLinkStyle}>Pricing</a>
-              <a href="/#faq" style={navLinkStyle}>FAQ</a>
+              <a onClick={() => handleNavClick("how")} style={{ ...navLinkStyle, cursor: "pointer" }}>How it works</a>
+              <a onClick={() => handleNavClick("pricing")} style={{ ...navLinkStyle, cursor: "pointer" }}>Pricing</a>
+              <a onClick={() => handleNavClick("faq")} style={{ ...navLinkStyle, cursor: "pointer" }}>FAQ</a>
               <div style={{ width: 12 }} />
 
               {session?.user?.email ? (
@@ -221,13 +234,13 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
           display: "none", flexDirection: "column", padding: "8px 0 16px",
         }}>
           {[
-            { label: "How it works", href: "/#how" },
-            { label: "Pricing",      href: "/#pricing" },
-            { label: "FAQ",          href: "/#faq" },
-          ].map(({ label, href }) => (
-            <a key={label} href={href} onClick={close} style={{
+            { label: "How it works", id: "how" },
+            { label: "Pricing",      id: "pricing" },
+            { label: "FAQ",          id: "faq" },
+          ].map(({ label, id }) => (
+            <a key={label} onClick={() => handleNavClick(id)} style={{
               display: "block", padding: "14px 20px",
-              fontSize: 16, fontWeight: 500,
+              fontSize: 16, fontWeight: 500, cursor: "pointer",
               color: "var(--navy-800)", textDecoration: "none",
               borderBottom: "1px solid var(--border)",
             }}>{label}</a>
