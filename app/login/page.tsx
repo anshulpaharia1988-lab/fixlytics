@@ -67,6 +67,10 @@ function LoginForm() {
           {error && (
             <p style={{ fontSize: 13, color: "var(--danger)", margin: "0 0 12px" }}>{error}</p>
           )}
+          <p style={{ fontSize: 13, color: "var(--fg-3)", margin: "0 0 16px", lineHeight: 1.6 }}>
+            We&apos;ll send a magic link to your email.<br />
+            Open the link on the device you want to use.
+          </p>
           <button
             type="submit"
             disabled={loading || !email.trim()}
