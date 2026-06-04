@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
       try {
         const emailResult = await resend.emails.send({
-          from: "Fixlytics <onboarding@resend.dev>",
+          from: "Fixlytics <support@fixlytics.app>",
           to: email,
           subject: "Your Fixlytics Report is Unlocked! 🎉",
           html: `
