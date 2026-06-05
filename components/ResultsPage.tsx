@@ -603,64 +603,38 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             fontSize: 17, color: "rgba(255,255,255,0.78)", lineHeight: 1.55,
             margin: "0 0 28px", maxWidth: 540, textWrap: "pretty",
           } as CSSProperties}>
-            2 fixes shown free. Unlock {lockedCount} more fix{lockedCount === 1 ? "" : "es"}  - each with a copy-paste solution you can ship today.
+            After payment, we personally review your site and send a detailed fix report to your email within 24 hours.
           </p>
 
-          {/* Feature table */}
+          {/* Honest feature list */}
           <div style={{
             background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.10)",
             borderRadius: 18, padding: "6px",
             backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", marginBottom: 24,
           }}>
             {[
-              { feat: `${lockedCount} more fix${lockedCount === 1 ? "" : "es"} with copy-paste code`, free: false, prem: true, important: true },
-              { feat: "Copy-paste rewrites for every page",         free: false, prem: true },
-              { feat: "Before / after mockup comparisons",          free: false, prem: true },
-              { feat: "Action checklist with progress tracker",     free: false, prem: true },
-              { feat: "Downloadable PDF report",                    free: false, prem: true },
-            ].map((row, i) => (
+              "Personal site review by our team",
+              "Detailed fixes for all locked issues",
+              "Sent to your email within 24 hours",
+              "Reply with questions — we respond personally",
+              "7-day money back guarantee",
+            ].map((feat, i) => (
               <div key={i} style={{
-                display: "grid", gridTemplateColumns: "1fr auto auto",
-                gap: 16, alignItems: "center",
+                display: "flex", alignItems: "center", gap: 12,
                 padding: "12px 14px",
                 borderBottom: i < 4 ? "1px solid rgba(255,255,255,0.06)" : "0",
                 fontSize: 14,
               }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  {row.important && (
-                    <span style={{
-                      fontSize: 9.5, fontWeight: 700, letterSpacing: "0.08em",
-                      background: "var(--accent)", color: "#fff",
-                      padding: "2px 6px", borderRadius: 4,
-                    }}>NEW</span>
-                  )}
-                  <span style={{ color: "rgba(255,255,255,0.88)", fontWeight: 500 }}>{row.feat}</span>
-                </div>
-                <div style={{ width: 44, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.40)", fontWeight: 600 }}>
-                  {row.free ? <Icon name="check" size={14} color="rgba(255,255,255,0.40)" /> : " -"}
-                </div>
-                <div style={{ width: 44, textAlign: "center" }}>
-                  <span style={{
-                    display: "inline-flex", alignItems: "center", justifyContent: "center",
-                    width: 20, height: 20, borderRadius: 6,
-                    background: "rgba(0,199,88,0.20)", color: "var(--green-400)",
-                  }}>
-                    <Icon name="check" size={13} strokeWidth={3} />
-                  </span>
-                </div>
+                <span style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+                  background: "rgba(0,199,88,0.20)", color: "var(--green-400)",
+                }}>
+                  <Icon name="check" size={13} strokeWidth={3} />
+                </span>
+                <span style={{ color: "rgba(255,255,255,0.88)", fontWeight: 500 }}>{feat}</span>
               </div>
             ))}
-            <div style={{
-              display: "grid", gridTemplateColumns: "1fr auto auto",
-              gap: 16, padding: "10px 14px 4px",
-              fontSize: 10.5, fontWeight: 700,
-              letterSpacing: "0.10em", textTransform: "uppercase",
-              color: "rgba(255,255,255,0.40)",
-            }}>
-              <div />
-              <div style={{ width: 44, textAlign: "center" }}>Free</div>
-              <div style={{ width: 44, textAlign: "center", color: "var(--green-400)" }}>Premium</div>
-            </div>
           </div>
 
           {/* Social proof */}
