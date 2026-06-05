@@ -431,8 +431,20 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
           }}>{issue.title}</div>
           <p style={{
             fontSize: 15.5, lineHeight: 1.6, color: "var(--fg-2)",
-            margin: "0 0 20px", textWrap: "pretty", maxWidth: 720,
+            margin: issue.contextMessage ? "0 0 10px" : "0 0 20px",
+            textWrap: "pretty", maxWidth: 720,
           } as CSSProperties}>{issue.why}</p>
+
+          {issue.contextMessage && (
+            <div style={{
+              fontSize: 13, fontStyle: "italic", color: "#92400e",
+              background: "#fffbeb", border: "1px solid #fde68a",
+              borderRadius: 8, padding: "8px 12px", marginBottom: 20,
+              maxWidth: 720,
+            }}>
+              💡 {issue.contextMessage}
+            </div>
+          )}
 
           {/* Impact + effort */}
           <div style={{

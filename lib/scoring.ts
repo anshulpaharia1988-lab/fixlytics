@@ -107,6 +107,7 @@ function issueNoMetaDesc(domain: string, domainShort: string, seoScore: number):
     fix: `Add a <meta name="description"> tag to ${domain} with 140–160 characters that includes your primary keyword and a clear call to action.`,
     impact: seoImpact(domainShort, seoScore),
     effort: "5 minutes",
+    contextMessage: "Google writes its own snippet — usually one that doesn't sell",
   };
 }
 
@@ -118,6 +119,7 @@ function issueTitleTooShort(domain: string, domainShort: string, seoScore: numbe
     fix: `Expand ${domain}'s title to '[Brand]  - [Primary Service] in [City/Region]' (50–60 characters total).`,
     impact: `Rank for 3+ more keywords related to ${domainShort}`,
     effort: "5 minutes",
+    contextMessage: "Short titles rank for fewer keywords in search",
   };
 }
 
@@ -129,6 +131,7 @@ function issueNoH1(domain: string, seoScore: number): Issue {
     fix: `Add exactly one <h1> tag to ${domain} containing your primary keyword. It should match the intent of your page title.`,
     impact: `+25% keyword relevance score for ${domain}`,
     effort: "5 minutes",
+    contextMessage: "Without H1, Google can't categorise your page topic",
   };
 }
 
@@ -140,6 +143,7 @@ function issueMultipleH1(domain: string): Issue {
     fix: `Keep exactly one H1 on ${domain} for the main topic. Demote additional H1s to H2 or H3 headings.`,
     impact: `Clearer topical authority for ${domain}`,
     effort: "10 minutes",
+    contextMessage: "Multiple H1s split Google's attention across topics",
   };
 }
 
@@ -151,6 +155,7 @@ function issueImgNoAlt(domain: string, count: number): Issue {
     fix: `Add descriptive alt attributes to all ${count} image${count === 1 ? "" : "s"} on ${domain}. Describe what's in the image and include relevant keywords where natural.`,
     impact: `Better accessibility + image search visibility for ${domain}`,
     effort: "15 minutes",
+    contextMessage: "Missing alt text means Google can't index your images",
   };
 }
 
@@ -164,6 +169,7 @@ function issueNoCTA(domain: string, uxScore: number): Issue {
     fix: `Add a single high-contrast button above the fold on ${domain} with a specific action: 'Book Now', 'Get a Free Quote', 'Shop Today'.`,
     impact: uxImpact(domain, uxScore),
     effort: "15 minutes",
+    contextMessage: "Hidden CTAs are the #1 reason visitors don't convert",
   };
 }
 
@@ -175,6 +181,7 @@ function issueMobileLayout(domain: string, uxScore: number): Issue {
     fix: `Test every page on ${domain} at 375px width. Fix overflow, increase tap targets to 44×44px minimum, and set font size to at least 16px.`,
     impact: `–45% mobile bounce rate for ${domain}`,
     effort: "2 hours",
+    contextMessage: "60%+ of your visitors are on mobile right now",
   };
 }
 
@@ -186,6 +193,7 @@ function issueLowContrast(domain: string, uxScore: number): Issue {
     fix: `Ensure all body text on ${domain} has at least 4.5:1 contrast ratio against its background. Use the WebAIM Contrast Checker.`,
     impact: `+12% time on page for ${domain}`,
     effort: "30 minutes",
+    contextMessage: "Low contrast fails accessibility — and loses readers",
   };
 }
 
@@ -197,6 +205,7 @@ function issueCTAAboveFold(domain: string, uxScore: number): Issue {
     fix: `Move ${domain}'s main CTA into the top 600px of the page. It should be visible without scrolling on desktop and mobile.`,
     impact: `+18–25% button clicks on ${domain}`,
     effort: "20 minutes",
+    contextMessage: "Hidden CTAs are the #1 reason visitors don't convert",
   };
 }
 
@@ -208,6 +217,7 @@ function issueFormUX(domain: string, uxScore: number): Issue {
     fix: `Audit ${domain}'s forms: remove non-essential fields, add placeholder text, and show validation errors inline as users type.`,
     impact: `–40% form abandonment on ${domain}`,
     effort: "1 hour",
+    contextMessage: "Every extra form field drops completion rate by 10%",
   };
 }
 

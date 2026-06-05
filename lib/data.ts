@@ -35,6 +35,7 @@ export interface Issue {
   fix: string;
   impact: string;
   effort: string;
+  contextMessage?: string;
 }
 
 export const ISSUES: Issue[] = [

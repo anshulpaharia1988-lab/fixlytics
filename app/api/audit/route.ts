@@ -180,6 +180,14 @@ export async function GET(request: NextRequest) {
             : savingsBytes
             ? `-${Math.round(savingsBytes / 1024)} KB transferred`
             : "Faster load time";
+          const speedContextMessages: Record<string, string> = {
+            "uses-optimized-images":       "Large images are the #1 cause of slow mobile sites",
+            "render-blocking-resources":   "Every second of delay costs 7% of conversions",
+            "uses-text-compression":       "Uncompressed text adds unnecessary load time for every visitor",
+            "unused-javascript":           "Unused code slows every visitor's first load",
+            "unused-css-rules":            "Dead CSS is parsed on every page load — pure wasted time",
+            "uses-long-cache-ttl":         "Without caching, repeat visitors re-download everything",
+          };
           speedIssues.push({
             id: `ps-${idx}`,
             area: "speed",
@@ -190,6 +198,7 @@ export async function GET(request: NextRequest) {
             fix: "Address the flagged items in your site's source code or CMS.",
             impact,
             effort: "30-60 minutes",
+            contextMessage: speedContextMessages[id],
           });
         });
 
