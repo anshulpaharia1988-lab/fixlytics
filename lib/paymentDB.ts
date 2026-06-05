@@ -31,6 +31,11 @@ export async function checkPayment(email: string, url: string): Promise<boolean>
   return !!data;
 }
 
+export async function getPayment(email: string, url: string): Promise<PaymentRecord | null> {
+  const key = `payment:${normalizeUrl(email)}:${normalizeUrl(url)}`;
+  return redis.get<PaymentRecord>(key);
+}
+
 export async function getUserPayments(email: string): Promise<PaymentRecord[]> {
   const pattern = `payment:${normalizeUrl(email)}:*`;
   const keys = await redis.keys(pattern);

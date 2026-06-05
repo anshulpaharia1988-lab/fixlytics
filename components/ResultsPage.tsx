@@ -797,6 +797,7 @@ export default function ResultsPage({
     () => initialData?.meta ?? { fcp: null, lcp: null, source: "deterministic" }
   );
   const [isPaid, setIsPaid] = useState(initialPaid);
+  const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
   const [copied, setCopied] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
   const [userEmail, setUserEmail] = useState("");
@@ -814,12 +815,23 @@ export default function ResultsPage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
-  // When session is available: check server-side payment status for cross-device access
+  // When session is available: check Redis for payment status + authoritative expiresAt
   useEffect(() => {
-    if (isPaid || !session?.user?.email || !url) return;
+    if (!session?.user?.email || !url) return;
     fetch(`/api/payment/status?url=${encodeURIComponent(url)}`)
       .then((r) => r.json())
-      .then((data) => { if (data.paid) { setIsPaid(true); } })
+      .then((data) => {
+        if (data.paid) {
+          setIsPaid(true);
+          // Compute days remaining from Redis expiresAt — never from localStorage
+          if (data.expiresAt) {
+            const left = Math.ceil(
+              (data.expiresAt - Date.now()) / (1000 * 60 * 60 * 24)
+            );
+            setDaysRemaining(Math.max(0, left));
+          }
+        }
+      })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email, url]);
@@ -1049,7 +1061,7 @@ export default function ResultsPage({
                   color: "var(--green-400)",
                 }}>
                   <Icon name="check-circle" size={14} />
-                  Full report unlocked · {getDaysRemaining(url)} days remaining
+                  Full report unlocked · {daysRemaining ?? getDaysRemaining(url)} days remaining
                 </div>
               )}
             </div>

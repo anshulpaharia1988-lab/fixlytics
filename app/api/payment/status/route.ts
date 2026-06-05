@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { checkPayment } from "@/lib/paymentDB";
+import { getPayment } from "@/lib/paymentDB";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -12,8 +12,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const paid = await checkPayment(session.user.email, url);
-    return Response.json({ paid });
+    const record = await getPayment(session.user.email, url);
+    if (!record) return Response.json({ paid: false });
+
+    // Verify not expired
+    if (Date.now() > record.expiresAt) {
+      return Response.json({ paid: false });
+    }
+
+    return Response.json({ paid: true, expiresAt: record.expiresAt });
   } catch {
     return Response.json({ paid: false }, { status: 500 });
   }
