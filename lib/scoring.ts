@@ -301,49 +301,12 @@ export function getDynamicIssues(scores: AuditScores, url = "", realSEO?: RealSE
   // Speed  - real issues come from PageSpeed in route.ts only.
   // getDynamicIssues never adds speed issues; it would be guessing.
 
-  // Premium issue 1 — dynamically chosen based on worst-scoring area
-  if (scores.speed.value <= scores.seo.value && scores.speed.value <= scores.ux.value) {
-    issues.push({
-      id: "premium-1", area: "speed", severity: "high", premium: true,
-      title: `Full speed waterfall analysis for ${domain}`,
-      why: `${domain} has multiple speed bottlenecks that need deep technical review — server response, render blocking, and resource loading order.`,
-      fix: "Hidden.",
-      impact: " -40–60% load time",
-      effort: "2 hours",
-      contextMessage: "A 1 second speed improvement increases conversions by 7%",
-    });
-  } else if (scores.seo.value <= scores.ux.value) {
-    issues.push({
-      id: "premium-1", area: "seo", severity: "high", premium: true,
-      title: `Competitor keyword gap analysis for ${domain}`,
-      why: `${domain} is missing keywords your competitors rank for. A full gap analysis shows exactly which terms to target first.`,
-      fix: "Hidden.",
-      impact: "+200–500% organic traffic potential",
-      effort: "3 hours",
-      contextMessage: "90% of web pages get zero organic traffic from Google",
-    });
+  // Premium  - general enough to show regardless of data source.
+  if (domain.length < 10) {
+    issues.push(premiumNoTrustSignals(domain, domainShort), premiumBuyerIntent(domain, domainShort));
   } else {
-    issues.push({
-      id: "premium-1", area: "ux", severity: "high", premium: true,
-      title: `Conversion funnel drop-off analysis for ${domain}`,
-      why: `${domain} visitors are leaving before converting. Find exactly where and why with a full funnel audit.`,
-      fix: "Hidden.",
-      impact: "+15–30% conversions",
-      effort: "2 hours",
-      contextMessage: "Most sites lose 80% of visitors before they convert",
-    });
+    issues.push(premiumNoCaching(domain), premiumMissingSchema(domain));
   }
-
-  // Premium issue 2 — mobile deep dive (always relevant)
-  issues.push({
-    id: "premium-2", area: "ux", severity: "med", premium: true,
-    title: `Mobile UX deep dive for ${domain}`,
-    why: `Over 60% of ${domain}&apos;s visitors are on mobile. Tap targets, font sizes, scroll behaviour, and layout all need detailed review.`,
-    fix: "Hidden.",
-    impact: "+20% mobile engagement",
-    effort: "1 hour",
-    contextMessage: "60%+ of all web traffic is now on mobile devices",
-  });
 
   return issues;
 }
