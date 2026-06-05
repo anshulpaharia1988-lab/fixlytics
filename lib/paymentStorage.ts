@@ -20,6 +20,7 @@ export function markAsPaid(url: string): void {
     expiresAt: expires.toISOString(),
   };
 
+  console.log("[paymentStorage] markAsPaid called — expiresAt set to:", expires.toISOString(), "for:", normalized);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
 }
 
@@ -52,6 +53,15 @@ export function getDaysRemaining(url: string): number {
   const expires = new Date(report.expiresAt);
   const diffMs = expires.getTime() - now.getTime();
   const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+  console.log("[paymentStorage] getDaysRemaining:", {
+    url: normalized,
+    paidAt: report.paidAt,
+    expiresAt: report.expiresAt,
+    now: now.toISOString(),
+    diffDays,
+  });
+
   return Math.max(0, diffDays);
 }
 
