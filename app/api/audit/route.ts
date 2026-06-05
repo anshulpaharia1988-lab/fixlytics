@@ -4,6 +4,7 @@ import { getDeterministicScores, getDynamicIssues, toneFor, type AuditScores, ty
 import type { Issue } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 const OPPORTUNITY_AUDITS = [
   "uses-optimized-images",
