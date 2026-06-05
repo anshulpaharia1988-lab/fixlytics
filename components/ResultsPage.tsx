@@ -48,48 +48,51 @@ function Eyebrow({ children, align = "center" }: { children: ReactNode; align?: 
 // ── DataSourceBanner ──────────────────────────────────────────────────────────
 function DataSourceBanner({ meta }: { meta: AuditData["meta"] }) {
   if (meta.source === "pagespeed") {
+    const parts = ["Data powered by Google PageSpeed API · Mobile scan"];
+    if (meta.fcp) parts.push(`FCP: ${meta.fcp}`);
+    if (meta.lcp) parts.push(`LCP: ${meta.lcp}`);
     return (
       <div style={{
-        background: "var(--green-50)", border: "1px solid var(--green-200)",
-        borderRadius: 16, padding: "16px 22px",
-        display: "flex", alignItems: "center", gap: 24, flexWrap: "wrap",
+        background: "#f0fdf4", border: "1px solid #bbf7d0",
+        borderRadius: 12, padding: "12px 16px",
+        display: "flex", alignItems: "center", gap: 10,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <Icon name="check-circle" size={16} color="var(--green-600)" />
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--green-700)" }}>
-            Data powered by Google PageSpeed API · Mobile scan
-          </span>
-        </div>
-        {meta.fcp && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--fg-2)" }}>
-            <span style={{ fontWeight: 600, color: "var(--navy-800)" }}>First Contentful Paint:</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--navy-800)" }}>
-              {meta.fcp}
-            </span>
-          </div>
-        )}
-        {meta.lcp && (
-          <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--fg-2)" }}>
-            <span style={{ fontWeight: 600, color: "var(--navy-800)" }}>Largest Contentful Paint:</span>
-            <span style={{ fontFamily: "var(--font-mono)", fontWeight: 700, color: "var(--navy-800)" }}>
-              {meta.lcp}
-            </span>
-          </div>
-        )}
+        <span style={{ color: "#16a34a", fontSize: 16, flexShrink: 0 }}>✓</span>
+        <span style={{ fontSize: 13, color: "#15803d", fontWeight: 500 }}>
+          {parts.join(" · ")}
+        </span>
       </div>
     );
   }
   return (
     <div style={{
-      background: "#fffbe6", border: "1px solid #e8c84a",
-      borderRadius: 16, padding: "16px 22px",
-      display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+      background: "#fffbeb", border: "1px solid #fde68a",
+      borderRadius: 12, padding: "12px 16px",
+      display: "flex", alignItems: "flex-start", gap: 12,
     }}>
-      <Icon name="alert-triangle" size={16} color="#a86200" />
-      <span style={{ fontSize: 13.5, color: "#92400e", fontWeight: 600 }}>
-        Google PageSpeed was unavailable  - speed score is estimated from site characteristics.
-        SEO signals were checked from your site&apos;s live HTML.
-      </span>
+      <span style={{ fontSize: 18, flexShrink: 0 }}>⚡</span>
+      <div>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "#92400e", marginBottom: 4 }}>
+          Speed score is estimated
+        </div>
+        <div style={{ fontSize: 13, color: "#78350f", lineHeight: 1.5 }}>
+          Google PageSpeed took too long to respond for this site.
+          UX and SEO signals were checked from live HTML.
+          Speed score is based on site characteristics.
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              background: "none", border: "none",
+              color: "#00c758", fontWeight: 600,
+              cursor: "pointer", fontSize: 13,
+              marginLeft: 8, fontFamily: "inherit",
+              textDecoration: "underline", padding: 0,
+            }}
+          >
+            Try again →
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
