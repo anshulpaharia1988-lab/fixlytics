@@ -110,8 +110,8 @@ export default function Home() {
     return (
       <ResultsPage
         url={url}
-        currency="₹"
-        price={2400}
+        currency="$"
+        price={29}
         onLogo={handleLogo}
         onRerun={handleRerun}
         onAudit={handleLogo}

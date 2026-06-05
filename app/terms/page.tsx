@@ -3,11 +3,11 @@ import PageLayout from "@/components/PageLayout";
 const SECTIONS = [
   {
     title: "Service description",
-    body: "Fixlytics provides automated website audits covering UX, SEO, and performance. The free audit shows a summary of issues. The full report - including detailed fixes and copy-paste recommendations - is available for a one-time fee of ₹2,400 per URL.",
+    body: "Fixlytics provides automated website audits covering UX, SEO, and performance. The free audit shows a summary of issues. The full report - including detailed fixes and copy-paste recommendations - is available for a one-time fee of $29 per URL.",
   },
   {
     title: "Payment terms",
-    body: "Full report access costs ₹2,400 (Indian Rupees) as a one-time payment per URL. Access is valid for 30 days on the same device and browser. No subscription is created. Payments are processed by Razorpay.",
+    body: "Full report access costs $29 (USD) as a one-time payment per URL. Access is valid for 30 days on the same device and browser. No subscription is created. Payments are processed by Razorpay.",
   },
   {
     title: "Refund policy",

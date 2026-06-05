@@ -12,8 +12,8 @@ export async function POST(_req: NextRequest) {
 
   try {
     const order = await razorpay.orders.create({
-      amount: 240000,
-      currency: "INR",
+      amount: 2900,
+      currency: "USD",
       receipt: `fixlytics_${Date.now()}`,
     });
     return Response.json({

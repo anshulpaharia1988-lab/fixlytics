@@ -1363,7 +1363,7 @@ export default function LandingPage({
           {[
             {
               q: "Is this free?",
-              a: "The basic audit is completely free. You get UX, SEO and speed scores plus 3–4 key issues. The full fix report with all issues and copy-paste fixes costs ₹2,400 one-time.",
+              a: "The basic audit is completely free. You get UX, SEO and speed scores plus 3–4 key issues. The full fix report with all issues and copy-paste fixes costs $29 one-time.",
             },
             {
               q: "How accurate are the results?",
@@ -1466,7 +1466,7 @@ export default function LandingPage({
           >
             Free preview audit. Full fix-report from{" "}
             <strong style={{ color: "#fff", fontWeight: 600 }}>
-              ₹2,400 one-time
+              $29 one-time
             </strong>{" "}
              - no subscription, no monthly fees.
           </p>
