@@ -819,7 +819,7 @@ export default function ResultsPage({
     if (isPaid || !session?.user?.email || !url) return;
     fetch(`/api/payment/status?url=${encodeURIComponent(url)}`)
       .then((r) => r.json())
-      .then((data) => { if (data.paid) { markAsPaid(url); setIsPaid(true); } })
+      .then((data) => { if (data.paid) { setIsPaid(true); } })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session?.user?.email, url]);
