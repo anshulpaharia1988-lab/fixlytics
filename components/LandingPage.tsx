@@ -825,7 +825,7 @@ export default function LandingPage({
   useEffect(() => {
     const shown = localStorage.getItem("fixlytics_popup_shown");
     if (!shown) {
-      setTimeout(() => setShowPopup(true), 4000);
+      setTimeout(() => setShowPopup(true), 1500);
     }
   }, []);
 
