@@ -627,13 +627,6 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
                 fontSize: 14,
               }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  {row.important && (
-                    <span style={{
-                      fontSize: 9.5, fontWeight: 700, letterSpacing: "0.08em",
-                      background: "var(--accent)", color: "#fff",
-                      padding: "2px 6px", borderRadius: 4,
-                    }}>NEW</span>
-                  )}
                   <span style={{ color: "rgba(255,255,255,0.88)", fontWeight: 500 }}>{row.feat}</span>
                 </div>
                 <div style={{ width: 44, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.40)", fontWeight: 600 }}>
