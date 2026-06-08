@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import Button from "./Button";
 import Chip from "./Chip";
@@ -820,6 +820,24 @@ export default function LandingPage({
   const [url, setUrl] = useState("");
   const [focused, setFocused] = useState(false);
   const [error, setError] = useState("");
+  const [showPopup, setShowPopup] = useState(false);
+
+  useEffect(() => {
+    const shown = localStorage.getItem("fixlytics_popup_shown");
+    if (!shown) {
+      setTimeout(() => setShowPopup(true), 4000);
+    }
+  }, []);
+
+  const closePopup = () => {
+    setShowPopup(false);
+    localStorage.setItem("fixlytics_popup_shown", "true");
+  };
+
+  function scrollToInput() {
+    closePopup();
+    document.getElementById("url-form")?.scrollIntoView({ behavior: "smooth" });
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -969,7 +987,7 @@ export default function LandingPage({
           </p>
 
           {/* URL input + CTA */}
-          <form onSubmit={handleSubmit} style={{ maxWidth: 620, margin: "0 auto" }}>
+          <form id="url-form" onSubmit={handleSubmit} style={{ maxWidth: 620, margin: "0 auto" }}>
             <div
               style={{
                 display: "flex",
@@ -1526,6 +1544,107 @@ export default function LandingPage({
           </div>
         </div>
       </section>
+
+      {/* ─────────────── VALUE PROP POPUP ─────────────── */}
+      {showPopup && (
+        <div
+          onClick={closePopup}
+          style={{
+            position: "fixed", inset: 0, zIndex: 1000,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 20, padding: 36,
+              maxWidth: 480, width: "100%", position: "relative",
+              boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+            }}
+          >
+            {/* Close button */}
+            <button
+              onClick={closePopup}
+              style={{
+                position: "absolute", top: 16, right: 16,
+                background: "var(--bg-page)", border: "1px solid var(--border)",
+                borderRadius: 8, width: 32, height: 32, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                color: "var(--fg-3)", fontFamily: "inherit",
+              }}
+            >
+              <Icon name="x" size={16} />
+            </button>
+
+            <div style={{ fontWeight: 800, fontSize: 22, color: "var(--navy-800)", marginBottom: 8 }}>
+              Your website is losing visitors right now.
+            </div>
+            <div style={{ fontSize: 15, color: "var(--fg-2)", marginBottom: 28 }}>
+              Most site owners don&apos;t know why. Fixlytics finds out in 90 seconds.
+            </div>
+
+            {[
+              {
+                icon: "🔍",
+                title: "See what Google really thinks of your site",
+                desc: "UX, SEO and Speed — all checked against 60+ real signals.",
+              },
+              {
+                icon: "⚡",
+                title: "Not another monthly subscription",
+                desc: "One-time $29. No hidden fees. No 'upgrade to see results.'",
+              },
+              {
+                icon: "🛠️",
+                title: "Fixes written in plain English",
+                desc: "Not 'optimize your LCP.' But 'your homepage image is 4MB — here is how to fix it.'",
+              },
+              {
+                icon: "🏆",
+                title: "Built for site owners, not developers",
+                desc: "You do not need to know what H1 tags are. We explain everything.",
+              },
+            ].map((row) => (
+              <div key={row.title} style={{ display: "flex", gap: 14, marginBottom: 20 }}>
+                <span style={{ fontSize: 24, flexShrink: 0 }}>{row.icon}</span>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--navy-800)" }}>
+                    {row.title}
+                  </div>
+                  <div style={{ fontSize: 13, color: "var(--fg-2)", marginTop: 4, lineHeight: 1.5 }}>
+                    {row.desc}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={scrollToInput}>
+              Run my free audit →
+            </Button>
+            <div style={{ fontSize: 12, color: "var(--fg-3)", textAlign: "center", marginTop: 12 }}>
+              Free to try · No signup needed · Takes 90 seconds
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─────────────── WHY FIXLYTICS BUTTON ─────────────── */}
+      <button
+        onClick={() => setShowPopup(true)}
+        style={{
+          position: "fixed", bottom: 24, right: 24, zIndex: 99,
+          background: "var(--navy-800)", color: "#fff",
+          borderRadius: 999, padding: "10px 18px",
+          fontSize: 13, fontWeight: 600,
+          boxShadow: "var(--shadow-lg)",
+          border: 0, cursor: "pointer", fontFamily: "inherit",
+          display: "flex", alignItems: "center", gap: 8,
+        }}
+      >
+        💡 Why Fixlytics?
+      </button>
 
       {/* ─────────────── FOOTER ─────────────── */}
       <footer
