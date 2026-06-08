@@ -613,11 +613,11 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", marginBottom: 24,
           }}>
             {[
-              { feat: `${lockedCount} more fix${lockedCount === 1 ? "" : "es"} with copy-paste code`, free: false, prem: true, important: true },
-              { feat: "Copy-paste rewrites for every page",         free: false, prem: true },
-              { feat: "Before / after mockup comparisons",          free: false, prem: true },
-              { feat: "Action checklist with progress tracker",     free: false, prem: true },
-              { feat: "Downloadable PDF report",                    free: false, prem: true },
+              { feat: "All issues unlocked with full details",  free: false, prem: true },
+              { feat: "Copy-paste fixes for each issue",        free: false, prem: true },
+              { feat: "Export full report as PDF",              free: false, prem: true },
+              { feat: "30 days access",                         free: false, prem: true },
+              { feat: "7-day money back guarantee",             free: false, prem: true },
             ].map((row, i) => (
               <div key={i} style={{
                 display: "grid", gridTemplateColumns: "1fr auto auto",
@@ -663,31 +663,6 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             </div>
           </div>
 
-          {/* Social proof */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap",
-            fontSize: 13.5, color: "rgba(255,255,255,0.70)",
-          }}>
-            <div style={{ display: "flex" }}>
-              {(["#016630", "#a86200", "#7e1d5c", "#16335c"] as const).map((c, i) => (
-                <div key={i} style={{
-                  width: 28, height: 28, borderRadius: "50%",
-                  background: c, border: "2px solid var(--navy-800)",
-                  marginLeft: i ? -10 : 0, color: "#fff",
-                  fontSize: 10, fontWeight: 700,
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                }}>{(["PM", "DC", "AO", "RT"] as const)[i]}</div>
-              ))}
-            </div>
-            <span>
-              <strong style={{ color: "#fff", fontWeight: 600 }}>2,847 creators</strong> upgraded this month
-            </span>
-            <span style={{ width: 1, height: 14, background: "rgba(255,255,255,0.16)" }} />
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "var(--sun-yellow)", letterSpacing: 1, fontSize: 14 }}>★★★★★</span>
-              <span><strong style={{ color: "#fff", fontWeight: 600 }}>4.8</strong>/5 from 2,300 reviews</span>
-            </div>
-          </div>
         </div>
 
         {/* RIGHT  - pricing card */}
@@ -698,17 +673,6 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
           backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
           boxShadow: "0 20px 40px -12px rgba(0,0,0,0.30), 0 0 0 1px rgba(255,255,255,0.04) inset",
         }}>
-          <div style={{
-            position: "absolute", top: -14, right: 20,
-            background: "linear-gradient(135deg, var(--amber-400), var(--amber-500))",
-            color: "#fff", padding: "6px 14px", borderRadius: 999,
-            fontSize: 11.5, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase",
-            boxShadow: "0 8px 20px -4px rgba(249,156,0,0.40)",
-            display: "inline-flex", alignItems: "center", gap: 6,
-          }}>
-            <Icon name="flame" size={12} /> Launch offer
-          </div>
-
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.62)", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>
               Full Fix Report
@@ -718,20 +682,11 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 4 }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 22 }}>
             <span style={{
               fontSize: 56, fontWeight: 800, letterSpacing: "-0.04em",
               color: "#fff", fontFeatureSettings: '"tnum"', lineHeight: 0.95,
             }}>{currency}{price.toLocaleString("en-IN")}</span>
-            <span style={{ fontSize: 18, color: "rgba(255,255,255,0.45)", textDecoration: "line-through" }}>
-              {currency}{Math.round(price * 2).toLocaleString("en-IN")}
-            </span>
-          </div>
-          <div style={{
-            fontSize: 13, color: "var(--green-400)", fontWeight: 700,
-            display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 22,
-          }}>
-            <Icon name="tag" size={12} /> 50% off  - ends in 2 days
           </div>
 
           <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
@@ -742,7 +697,6 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
             {[
               { icon: "zap",          text: "Instant access  - view in browser" },
               { icon: "shield-check", text: "7-day money-back guarantee" },
-              { icon: "mail",         text: "PDF emailed to you in 60 seconds" },
             ].map((item) => (
               <div key={item.text} style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <span style={{
