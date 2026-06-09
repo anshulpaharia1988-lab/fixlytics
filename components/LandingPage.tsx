@@ -1621,7 +1621,7 @@ export default function LandingPage({
             ))}
 
             <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={scrollToInput}>
-              Run my free audit →
+              Run my free audit
             </Button>
             <div style={{ fontSize: 12, color: "var(--fg-3)", textAlign: "center", marginTop: 12 }}>
               Free to try · No signup needed · Takes 90 seconds
