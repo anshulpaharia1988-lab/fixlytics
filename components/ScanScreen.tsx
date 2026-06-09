@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect, useRef } from "react";
 import Icon from "./Icon";
 import type { AuditData } from "@/lib/scoring";
@@ -23,7 +23,7 @@ export default function ScanScreen({ url, onDone }: ScanScreenProps) {
   // Holds the in-flight audit promise so the animation can wait for it
   const auditPromiseRef = useRef<Promise<AuditData | null>>(new Promise(() => {}));
 
-  // Fire the API call immediately — runs concurrently with the animation
+  // Fire the API call immediately - runs concurrently with the animation
   useEffect(() => {
     auditPromiseRef.current = fetch(`/api/audit?url=${encodeURIComponent(url)}`)
       .then((r) => r.json() as Promise<AuditData>)
@@ -39,7 +39,7 @@ export default function ScanScreen({ url, onDone }: ScanScreenProps) {
     function next() {
       if (cancelled) return;
       if (i >= SCAN_STEPS.length) {
-        // Animation finished — wait for audit data before navigating.
+        // Animation finished - wait for audit data before navigating.
         // Progress stays at 99% (last step keeps spinning) until data arrives.
         auditPromiseRef.current.then((data) => {
           if (cancelled) return;
@@ -56,7 +56,7 @@ export default function ScanScreen({ url, onDone }: ScanScreenProps) {
       function tick(now: number) {
         if (cancelled) return;
         const dt = now - startMs;
-        // Cap at 99 — final 1% only completes when API data arrives
+        // Cap at 99 - final 1% only completes when API data arrives
         const p = Math.min(99, ((start + Math.min(dt, step.ms)) / totalMs) * 100);
         setProgress(p);
         if (dt < step.ms) requestAnimationFrame(tick);

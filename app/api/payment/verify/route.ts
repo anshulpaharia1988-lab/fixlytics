@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+﻿import type { NextRequest } from "next/server";
 import crypto from "crypto";
 import { Resend } from "resend";
 import { getServerSession } from "next-auth";
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     console.log("[verify] signature match:", success);
 
     if (success && userEmail) {
-      // Save to Upstash Redis — enables cross-device access recovery
+      // Save to Upstash Redis - enables cross-device access recovery
       try {
         await savePayment(userEmail, auditUrl ?? "");
         console.log("[verify] KV save OK for:", userEmail);

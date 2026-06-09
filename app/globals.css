@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 /* ─── Tailwind v4 ─── */
 @import "tailwindcss";
@@ -343,7 +343,7 @@ h3, .h3 {
     filter: none !important;
   }
 
-  /* PDF header — hidden on screen, shown in print */
+  /* PDF header - hidden on screen, shown in print */
   .pdf-header {
     display: flex !important;
     flex-direction: column;

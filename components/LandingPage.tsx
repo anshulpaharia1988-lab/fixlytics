@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import Button from "./Button";
@@ -1589,7 +1589,7 @@ export default function LandingPage({
               {
                 icon: "🔍",
                 title: "See what Google really thinks of your site",
-                desc: "UX, SEO and Speed — all checked against 60+ real signals.",
+                desc: "UX, SEO and Speed - all checked against 60+ real signals.",
               },
               {
                 icon: "⚡",
@@ -1599,7 +1599,7 @@ export default function LandingPage({
               {
                 icon: "🛠️",
                 title: "Fixes written in plain English",
-                desc: "Not 'optimize your LCP.' But 'your homepage image is 4MB — here is how to fix it.'",
+                desc: "Not 'optimize your LCP.' But 'your homepage image is 4MB - here is how to fix it.'",
               },
               {
                 icon: "🏆",

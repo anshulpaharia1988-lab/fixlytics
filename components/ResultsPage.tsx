@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useMemo, useEffect } from "react";
 import { useSession, signIn } from "next-auth/react";
 import type { CSSProperties, ReactNode } from "react";
@@ -785,7 +785,7 @@ export default function ResultsPage({
       .then((data) => {
         if (data.paid) {
           setIsPaid(true);
-          // Compute days remaining from Redis expiresAt — never from localStorage
+          // Compute days remaining from Redis expiresAt - never from localStorage
           if (data.expiresAt) {
             const left = Math.ceil(
               (data.expiresAt - Date.now()) / (1000 * 60 * 60 * 24)
@@ -911,7 +911,7 @@ export default function ResultsPage({
       const data = await res.json();
       if (data.paid) {
         if (session?.user?.email) {
-          // Logged in — restore immediately
+          // Logged in - restore immediately
           setRecoverStatus("found");
           markAsPaid(url);
           setUserEmail(recoverEmail);
@@ -921,7 +921,7 @@ export default function ResultsPage({
             setRecoverStatus("idle");
           }, 1200);
         } else {
-          // Payment found but not logged in — prompt sign in
+          // Payment found but not logged in - prompt sign in
           setRecoverStatus("found-need-login");
         }
       } else {

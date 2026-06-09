@@ -1,4 +1,4 @@
-export interface PaidReport {
+﻿export interface PaidReport {
   url: string;
   paidAt: string;
   expiresAt: string;
@@ -20,7 +20,7 @@ export function markAsPaid(url: string): void {
     expiresAt: expires.toISOString(),
   };
 
-  console.log("[paymentStorage] markAsPaid called — expiresAt set to:", expires.toISOString(), "for:", normalized);
+  console.log("[paymentStorage] markAsPaid called - expiresAt set to:", expires.toISOString(), "for:", normalized);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(existing));
 }
 

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import Script from "next/script";
 import SessionWrapper from "@/components/SessionWrapper";
@@ -13,7 +13,7 @@ const geist = Geist({
 export const metadata: Metadata = {
   title: "Fixlytics | Fix Your Website in Minutes with AI",
   description:
-    "Paste your link. We'll find the UX, SEO and speed issues holding you back — and write the fixes for you. No code. No jargon.",
+    "Paste your link. We'll find the UX, SEO and speed issues holding you back - and write the fixes for you. No code. No jargon.",
 };
 
 const GA_ID      = process.env.NEXT_PUBLIC_GA_ID      || "G-E4T776TDLR";
@@ -38,7 +38,7 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
         />
 
-        {/* Google Analytics — only injected when ID is configured */}
+        {/* Google Analytics - only injected when ID is configured */}
         {GA_ID && (
           <>
             <script
@@ -58,7 +58,7 @@ export default function RootLayout({
           </>
         )}
 
-        {/* Microsoft Clarity — only injected when ID is configured */}
+        {/* Microsoft Clarity - only injected when ID is configured */}
         {CLARITY_ID && (
           <script
             dangerouslySetInnerHTML={{

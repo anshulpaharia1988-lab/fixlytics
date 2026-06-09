@@ -1,4 +1,4 @@
-import type { Issue } from "./data";
+﻿import type { Issue } from "./data";
 
 export interface AuditData {
   scores: AuditScores;
@@ -107,7 +107,7 @@ function issueNoMetaDesc(domain: string, domainShort: string, seoScore: number):
     fix: `Add a <meta name="description"> tag to ${domain} with 140–160 characters that includes your primary keyword and a clear call to action.`,
     impact: seoImpact(domainShort, seoScore),
     effort: "5 minutes",
-    contextMessage: "Google writes its own snippet — usually one that doesn't sell",
+    contextMessage: "Google writes its own snippet - usually one that doesn't sell",
   };
 }
 
@@ -193,7 +193,7 @@ function issueLowContrast(domain: string, uxScore: number): Issue {
     fix: `Ensure all body text on ${domain} has at least 4.5:1 contrast ratio against its background. Use the WebAIM Contrast Checker.`,
     impact: `+12% time on page for ${domain}`,
     effort: "30 minutes",
-    contextMessage: "Low contrast fails accessibility — and loses readers",
+    contextMessage: "Low contrast fails accessibility - and loses readers",
   };
 }
 

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Button from "./Button";
@@ -114,7 +114,7 @@ export default function TopNav({ onLogo, onAudit }: TopNavProps) {
               <div style={{ width: 12 }} />
 
               {session?.user?.email ? (
-                /* Logged in — avatar + email button opens dropdown */
+                /* Logged in - avatar + email button opens dropdown */
                 <div ref={dropdownRef} style={{ position: "relative" }}>
                   <button
                     onClick={() => setDropdownOpen((o) => !o)}

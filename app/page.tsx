@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useState, useEffect } from "react";
 import LandingPage from "@/components/LandingPage";
 import ScanScreen from "@/components/ScanScreen";
@@ -38,7 +38,7 @@ export default function Home() {
   useEffect(() => {
     let mounted = true;
 
-    // Priority 1: URL params — set after magic-link login callback
+    // Priority 1: URL params - set after magic-link login callback
     // /?url=https://site.com&view=results → go straight to results
     try {
       const params = new URLSearchParams(window.location.search);
@@ -56,7 +56,7 @@ export default function Home() {
       }
     } catch { /* ignore */ }
 
-    // Priority 2: sessionStorage — refresh while on results page
+    // Priority 2: sessionStorage - refresh while on results page
     try {
       const savedUrl  = sessionStorage.getItem(KEY_URL);
       const savedView = sessionStorage.getItem(KEY_VIEW);

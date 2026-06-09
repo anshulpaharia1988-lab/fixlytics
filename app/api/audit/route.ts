@@ -1,4 +1,4 @@
-import type { NextRequest } from "next/server";
+﻿import type { NextRequest } from "next/server";
 import { load } from "cheerio";
 import { getDeterministicScores, getDynamicIssues, toneFor, type AuditScores, type RealSEO } from "@/lib/scoring";
 import type { Issue } from "@/lib/data";
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       }
 
       if (!psResponse) {
-        console.log("[PageSpeed] Both strategies failed — falling back to deterministic. Total:", Date.now() - psStart, "ms");
+        console.log("[PageSpeed] Both strategies failed - falling back to deterministic. Total:", Date.now() - psStart, "ms");
       }
 
       // htmlFetchPromise resolves to the full HTML string (or null if failed/blocked).
@@ -119,9 +119,9 @@ export async function GET(request: NextRequest) {
           const titleLength = $("title").first().text().trim().length;
 
           // If the page has no <title>, we almost certainly got a bot-detection
-          // or redirect page — not the real site. Don't trust any SEO signals from it.
+          // or redirect page - not the real site. Don't trust any SEO signals from it.
           if (titleLength === 0) {
-            console.log("[SEO Check]", url, { htmlFetched: false, reason: "no <title> — likely bot-detection page" });
+            console.log("[SEO Check]", url, { htmlFetched: false, reason: "no <title> - likely bot-detection page" });
           } else {
             realSEO.htmlFetched   = true;
             realSEO.hasMetaDesc   = metaDesc.trim().length > 10;
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
             });
           }
         } catch {
-          // HTML parse failed — htmlFetched stays false, no HTML-based issues shown
+          // HTML parse failed - htmlFetched stays false, no HTML-based issues shown
         }
       } else {
         console.log("[SEO Check]", url, { htmlFetched: false, reason: "fetch returned null" });
@@ -164,7 +164,7 @@ export async function GET(request: NextRequest) {
             tone: toneFor(perfScore),
             label: "Site Speed",
             desc: perfScore < 50
-              ? "The page loads too slowly on mobile — most visitors won't wait."
+              ? "The page loads too slowly on mobile - most visitors won't wait."
               : "Load times are acceptable, but improvements are available.",
           },
         };
@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
             "render-blocking-resources":   "Every second of delay costs 7% of conversions",
             "uses-text-compression":       "Uncompressed text adds unnecessary load time for every visitor",
             "unused-javascript":           "Unused code slows every visitor's first load",
-            "unused-css-rules":            "Dead CSS is parsed on every page load — pure wasted time",
+            "unused-css-rules":            "Dead CSS is parsed on every page load - pure wasted time",
             "uses-long-cache-ttl":         "Without caching, repeat visitors re-download everything",
           };
           speedIssues.push({
@@ -218,7 +218,7 @@ export async function GET(request: NextRequest) {
         });
       }
 
-      // Both PageSpeed attempts failed — use deterministic scores with whatever HTML data we got
+      // Both PageSpeed attempts failed - use deterministic scores with whatever HTML data we got
       return Response.json({
         scores: deterministicScores,
         issues: getDynamicIssues(deterministicScores, url, realSEO),

@@ -1,4 +1,4 @@
-import PageLayout from "@/components/PageLayout";
+﻿import PageLayout from "@/components/PageLayout";
 
 const SECTIONS = [
   {
@@ -6,7 +6,7 @@ const SECTIONS = [
     items: [
       "Website URLs you enter for auditing",
       "Email address (when you sign in or make a payment)",
-      "Payment information — processed securely by Razorpay; we never store card details",
+      "Payment information - processed securely by Razorpay; we never store card details",
       "Anonymous usage data via Google Analytics",
       "Anonymized session recordings via Microsoft Clarity",
     ],
@@ -33,14 +33,14 @@ const SECTIONS = [
     items: [
       "Email and payment records are stored in an encrypted database (Upstash Redis)",
       "Audit results are stored temporarily in your browser via localStorage",
-      "Payment records are kept for 30 days — the duration of your report access",
+      "Payment records are kept for 30 days - the duration of your report access",
     ],
   },
   {
     title: "Cookies & Analytics",
     items: [
-      "Google Analytics — anonymous usage tracking (pages visited, session duration)",
-      "Microsoft Clarity — anonymized session recordings to understand usability",
+      "Google Analytics - anonymous usage tracking (pages visited, session duration)",
+      "Microsoft Clarity - anonymized session recordings to understand usability",
       "Session cookies for login, managed by NextAuth (no tracking cookies)",
     ],
   },
@@ -48,7 +48,7 @@ const SECTIONS = [
     title: "Payment Security",
     items: [
       "All payments are processed by Razorpay, which is PCI DSS Level 1 compliant",
-      "We receive only a confirmation of a successful payment — never card numbers, CVVs, or bank details",
+      "We receive only a confirmation of a successful payment - never card numbers, CVVs, or bank details",
     ],
   },
   {
