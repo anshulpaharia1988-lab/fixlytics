@@ -739,8 +739,8 @@ interface ResultsPageProps {
 
 export default function ResultsPage({
   url,
-  currency = "₹",
-  price = 2400,
+  currency = "$",
+  price = 29,
   onLogo,
   onRerun,
   onAudit,

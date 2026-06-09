@@ -161,7 +161,7 @@ export const STAT_STRIP = [
   { value: "90 sec", label: "Average audit time" },
   { value: "60+",    label: "Checks per audit" },
   { value: "Free",   label: "Basic audit cost" },
-  { value: "₹2,400", label: "Full report, one-time" },
+  { value: "$29", label: "Full report, one-time" },
 ];
 
 export interface Testimonial {
@@ -191,7 +191,7 @@ export const TESTIMONIALS: Testimonial[] = [
   },
   {
     quote:
-      "Best ₹2,400 I've spent on the business. The before/after rewrites alone were worth it  - I just copy-pasted them in.",
+      "Best $29 I've spent on the business. The before/after rewrites alone were worth it  - I just copy-pasted them in.",
     name: "Aisha Okafor",
     role: "Studio Manager, Glasshouse Ceramics",
     initials: "AO",
