@@ -1008,6 +1008,14 @@ export default function LandingPage({
               No code. No jargon.
             </strong>
           </p>
+          <p style={{
+            fontSize: 14, fontWeight: 600,
+            color: 'var(--green-700)',
+            margin: '0 auto 32px',
+            textAlign: 'center',
+          }}>
+            Not for SEO experts. For site owners who just want their site to work better.
+          </p>
 
           {/* URL input + CTA */}
           <form id="url-form" onSubmit={handleSubmit} style={{ maxWidth: 620, margin: "0 auto" }}>
@@ -1604,6 +1612,13 @@ export default function LandingPage({
             <div style={{ fontWeight: 800, fontSize: 22, color: "var(--navy-800)", marginBottom: 8 }}>
               Your website is losing visitors right now.
             </div>
+            <p style={{
+              fontSize: 13, color: 'var(--green-700)',
+              fontWeight: 600, marginBottom: 20,
+              marginTop: -16,
+            }}>
+              Not for SEO experts. For site owners who just want their site to work better.
+            </p>
             <div style={{ fontSize: 15, color: "var(--fg-2)", marginBottom: 28 }}>
               Most site owners don&apos;t know why. Fixlytics finds out in 90 seconds.
             </div>
