@@ -818,6 +818,11 @@ export default function ResultsPage({
   const [userEmail, setUserEmail] = useState("");
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [recoverEmail, setRecoverEmail] = useState("");
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackType, setFeedbackType] = useState<'positive' | 'negative' | null>(null);
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackEmail, setFeedbackEmail] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
   const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "found-need-login" | "not-found">("idle");
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -1530,6 +1535,131 @@ export default function ResultsPage({
           </span>
         </div>
       </footer>
+
+      {/* Floating feedback button */}
+      <div className="no-print" style={{ position: 'fixed', bottom: 24, left: 24, zIndex: 99 }}>
+        {!showFeedback ? (
+          <button
+            onClick={() => setShowFeedback(true)}
+            style={{
+              background: 'var(--navy-800)', color: '#fff',
+              border: 'none', borderRadius: 999,
+              padding: '10px 18px', fontSize: 13, fontWeight: 600,
+              cursor: 'pointer', boxShadow: 'var(--shadow-lg)',
+              display: 'flex', alignItems: 'center', gap: 8,
+              fontFamily: 'inherit',
+            }}
+          >
+            💬 Share feedback
+          </button>
+        ) : (
+          <div style={{
+            background: '#fff', borderRadius: 16, padding: 20,
+            width: 300, boxShadow: 'var(--shadow-xl)',
+            border: '1px solid var(--border)',
+          }}>
+            {!feedbackSent ? (
+              <>
+                <div style={{
+                  display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'center', marginBottom: 16,
+                }}>
+                  <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--navy-800)' }}>
+                    How was your experience?
+                  </span>
+                  <button
+                    onClick={() => setShowFeedback(false)}
+                    style={{
+                      background: 'none', border: 'none', cursor: 'pointer',
+                      fontSize: 18, color: 'var(--fg-3)', fontFamily: 'inherit',
+                    }}
+                  >×</button>
+                </div>
+
+                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                  <button
+                    onClick={() => setFeedbackType('positive')}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: 10, fontSize: 24,
+                      border: feedbackType === 'positive' ? '2px solid var(--green-500)' : '1px solid var(--border)',
+                      background: feedbackType === 'positive' ? 'var(--green-50)' : '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >👍</button>
+                  <button
+                    onClick={() => setFeedbackType('negative')}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: 10, fontSize: 24,
+                      border: feedbackType === 'negative' ? '2px solid var(--danger)' : '1px solid var(--border)',
+                      background: feedbackType === 'negative' ? 'var(--danger-bg)' : '#fff',
+                      cursor: 'pointer',
+                    }}
+                  >👎</button>
+                </div>
+
+                {feedbackType && (
+                  <>
+                    <textarea
+                      placeholder={feedbackType === 'positive' ? "What did you like?" : "What could be better?"}
+                      value={feedbackText}
+                      onChange={(e) => setFeedbackText(e.target.value)}
+                      style={{
+                        width: '100%', border: '1px solid var(--border)',
+                        borderRadius: 8, padding: '10px 12px',
+                        fontSize: 13, fontFamily: 'inherit',
+                        resize: 'none', height: 80,
+                        marginBottom: 10, outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email (optional)"
+                      value={feedbackEmail}
+                      onChange={(e) => setFeedbackEmail(e.target.value)}
+                      style={{
+                        width: '100%', border: '1px solid var(--border)',
+                        borderRadius: 8, padding: '10px 12px',
+                        fontSize: 13, fontFamily: 'inherit',
+                        marginBottom: 12, outline: 'none',
+                        boxSizing: 'border-box',
+                      }}
+                    />
+                    <button
+                      onClick={async () => {
+                        await fetch('/api/feedback', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ type: feedbackType, text: feedbackText, email: feedbackEmail, url }),
+                        });
+                        setFeedbackSent(true);
+                      }}
+                      style={{
+                        width: '100%', background: 'var(--accent)',
+                        color: '#fff', border: 'none', borderRadius: 10,
+                        padding: '12px', fontSize: 14, fontWeight: 600,
+                        cursor: 'pointer', fontFamily: 'inherit',
+                      }}
+                    >
+                      Send feedback
+                    </button>
+                  </>
+                )}
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                <div style={{ fontSize: 32, marginBottom: 12 }}>🙏</div>
+                <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--navy-800)', marginBottom: 8 }}>
+                  Thank you!
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--fg-2)' }}>
+                  Your feedback helps us improve Fixlytics.
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
