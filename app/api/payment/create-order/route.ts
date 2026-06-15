@@ -1,9 +1,28 @@
 import type { NextRequest } from "next/server";
 import Razorpay from "razorpay";
+import { validateCoupon } from "@/lib/coupons";
 
-export async function POST(_req: NextRequest) {
+export async function POST(req: NextRequest) {
   console.log("RAZORPAY_KEY_ID:", process.env.RAZORPAY_KEY_ID ? "SET" : "NOT SET");
   console.log("RAZORPAY_KEY_SECRET:", process.env.RAZORPAY_KEY_SECRET ? "SET" : "NOT SET");
+
+  const body = await req.json().catch(() => ({}));
+  const couponCode = body?.coupon as string | undefined;
+
+  let discountPercent = 0;
+  if (couponCode) {
+    const result = validateCoupon(couponCode);
+    if (result.valid) discountPercent = result.discount;
+  }
+
+  if (discountPercent === 100) {
+    return Response.json({ free: true });
+  }
+
+  const baseAmount = 2900;
+  const discountedAmount = discountPercent > 0
+    ? Math.round(baseAmount * (1 - discountPercent / 100))
+    : baseAmount;
 
   const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID!,
@@ -12,7 +31,7 @@ export async function POST(_req: NextRequest) {
 
   try {
     const order = await razorpay.orders.create({
-      amount: 2900,
+      amount: discountedAmount,
       currency: "USD",
       receipt: `fixlytics_${Date.now()}`,
     });

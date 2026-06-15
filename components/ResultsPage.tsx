@@ -12,6 +12,7 @@ import {
   markAsPaid,
   getDaysRemaining,
 } from "@/lib/paymentStorage";
+import { validateCoupon } from "@/lib/coupons";
 
 // ── Metadata maps ─────────────────────────────────────────────────────────────
 const AREA_META = {
@@ -533,9 +534,12 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
 }
 
 // ── LockedPremiumPanel ────────────────────────────────────────────────────────
-function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
+function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode, couponMessage, couponDiscount, onCouponChange, onCouponApply }: {
   currency: string; price: number; lockedCount: number; onUnlock: () => void;
+  couponCode: string; couponMessage: string; couponDiscount: number;
+  onCouponChange: (code: string) => void; onCouponApply: () => void;
 }) {
+  const effectivePrice = couponDiscount > 0 ? price * (1 - couponDiscount / 100) : price;
   return (
     <div style={{
       position: "relative",
@@ -676,14 +680,63 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock }: {
           </div>
 
           <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: 22 }}>
+            {couponDiscount > 0 && (
+              <span style={{
+                fontSize: 28, fontWeight: 600, letterSpacing: "-0.02em",
+                color: "rgba(255,255,255,0.35)", textDecoration: "line-through", lineHeight: 0.95,
+              }}>{currency}{price.toLocaleString("en-IN")}</span>
+            )}
             <span style={{
               fontSize: 56, fontWeight: 800, letterSpacing: "-0.04em",
               color: "#fff", fontFeatureSettings: '"tnum"', lineHeight: 0.95,
-            }}>{currency}{price.toLocaleString("en-IN")}</span>
+            }}>
+              {couponDiscount === 100 ? "FREE" : couponDiscount > 0 ? `${currency}${effectivePrice.toFixed(2)}` : `${currency}${price.toLocaleString("en-IN")}`}
+            </span>
+          </div>
+
+          {/* Coupon code */}
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 8 }}>
+              Have a coupon code?
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                value={couponCode}
+                onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
+                onKeyDown={(e) => e.key === "Enter" && onCouponApply()}
+                placeholder="Enter code"
+                style={{
+                  flex: 1, padding: "10px 12px", fontSize: 13,
+                  background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)",
+                  borderRadius: 10, color: "#fff", fontFamily: "inherit",
+                  outline: "none",
+                }}
+              />
+              <button
+                onClick={onCouponApply}
+                style={{
+                  padding: "10px 16px", borderRadius: 10,
+                  background: "rgba(0,199,88,0.20)", border: "1px solid rgba(0,199,88,0.30)",
+                  color: "var(--green-400)", fontFamily: "inherit",
+                  fontSize: 13, fontWeight: 700, cursor: "pointer",
+                }}
+              >
+                Apply
+              </button>
+            </div>
+            {couponMessage && (
+              <div style={{
+                fontSize: 12.5, marginTop: 6, fontWeight: 600,
+                color: couponDiscount > 0 ? "var(--green-400)" : "#ef4444",
+              }}>
+                {couponMessage}
+              </div>
+            )}
           </div>
 
           <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
-            Unlock Full Report
+            {couponDiscount === 100 ? "Unlock Free - Coupon Applied!" : "Unlock Full Report"}
           </Button>
 
           <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.72)" }}>
@@ -766,6 +819,10 @@ export default function ResultsPage({
   const [showRecoverModal, setShowRecoverModal] = useState(false);
   const [recoverEmail, setRecoverEmail] = useState("");
   const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "found-need-login" | "not-found">("idle");
+  const [couponCode, setCouponCode] = useState("");
+  const [couponApplied, setCouponApplied] = useState(false);
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [couponMessage, setCouponMessage] = useState("");
   // session must be declared before any useEffect that references it
   const { data: session } = useSession();
 
@@ -833,6 +890,34 @@ export default function ResultsPage({
     window.print();
   }
 
+  function applyCoupon() {
+    if (!couponCode.trim()) return;
+    const result = validateCoupon(couponCode);
+    setCouponMessage(result.message);
+    if (result.valid) {
+      setCouponDiscount(result.discount);
+      setCouponApplied(true);
+    } else {
+      setCouponDiscount(0);
+      setCouponApplied(false);
+    }
+  }
+
+  async function handleFreeCouponUnlock(email: string) {
+    setCouponMessage("Access unlocked! Loading your full report...");
+    markAsPaid(url);
+    setIsPaid(true);
+    try {
+      await fetch("/api/payment/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coupon: true, email, auditUrl: url }),
+      });
+    } catch {
+      // Non-fatal: access already unlocked locally
+    }
+  }
+
   // Actual Razorpay checkout  - only called after email is confirmed
   async function runPayment() {
     const loaded = await loadRazorpayScript();
@@ -840,12 +925,22 @@ export default function ResultsPage({
       alert("Could not load payment gateway. Please try again.");
       return;
     }
-    const orderRes = await fetch("/api/payment/create-order", { method: "POST" });
+    const orderRes = await fetch("/api/payment/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ coupon: couponApplied ? couponCode : null }),
+    });
     if (!orderRes.ok) {
       alert("Could not create order. Please try again.");
       return;
     }
-    const { orderId, amount, currency: orderCurrency, keyId } = await orderRes.json();
+    const orderData = await orderRes.json();
+    if (orderData.free) {
+      markAsPaid(url);
+      setIsPaid(true);
+      return;
+    }
+    const { orderId, amount, currency: orderCurrency, keyId } = orderData;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const rzp = new (window as any).Razorpay({
       key: keyId,
@@ -898,7 +993,11 @@ export default function ResultsPage({
       return;
     }
     setUserEmail(sessionEmail);
-    runPayment();
+    if (couponDiscount === 100) {
+      handleFreeCouponUnlock(sessionEmail);
+    } else {
+      runPayment();
+    }
   }
 
   async function handleRecoverAccess() {
@@ -1163,6 +1262,11 @@ export default function ResultsPage({
               price={price}
               lockedCount={lockedCount}
               onUnlock={handleUnlock}
+              couponCode={couponCode}
+              couponMessage={couponMessage}
+              couponDiscount={couponDiscount}
+              onCouponChange={(code) => { setCouponCode(code); setCouponMessage(""); }}
+              onCouponApply={applyCoupon}
             />
             {/* Already paid recovery link */}
             <div style={{ textAlign: "center", marginTop: 20 }}>

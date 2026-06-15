@@ -8,13 +8,21 @@ import { savePayment } from "@/lib/paymentDB";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email: bodyEmail, auditUrl } = body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, email: bodyEmail, auditUrl, coupon } = body;
 
     // Prefer session email (guaranteed authentic) over body email
     const session = await getServerSession(authOptions);
     const userEmail = session?.user?.email ?? bodyEmail ?? "";
 
     console.log("[verify] payload:", { userEmail, auditUrl, hasOrderId: !!razorpay_order_id });
+
+    // Coupon-based free unlock: skip signature check, just save payment record
+    if (coupon === true) {
+      if (userEmail) {
+        try { await savePayment(userEmail, auditUrl ?? ""); } catch {}
+      }
+      return Response.json({ success: true });
+    }
 
     const hmacBody = razorpay_order_id + "|" + razorpay_payment_id;
     const expected = crypto
