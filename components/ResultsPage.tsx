@@ -705,7 +705,7 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode
                 value={couponCode}
                 onChange={(e) => onCouponChange(e.target.value.toUpperCase())}
                 onKeyDown={(e) => e.key === "Enter" && onCouponApply()}
-                placeholder="Enter code"
+                placeholder="Try BETA100 for free access"
                 style={{
                   flex: 1, padding: "10px 12px", fontSize: 13,
                   background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.16)",
@@ -1070,21 +1070,30 @@ export default function ResultsPage({
         </div>
       </div>
 
-      <TopNav onLogo={onLogo} onAudit={onAudit} />
-
       {/* Beta banner */}
-      {!isPaid && (
-        <div style={{
+      <div style={{
+        background: 'var(--navy-800)',
+        color: '#fff',
+        padding: '10px 16px',
+        textAlign: 'center',
+        fontSize: 14,
+        fontWeight: 500,
+      }}>
+        🎉 Beta access is free! Use code{' '}
+        <strong style={{
           background: 'var(--green-glow)',
           color: 'var(--green-700)',
-          padding: '10px 16px',
-          textAlign: 'center',
-          fontSize: 14,
-          fontWeight: 600,
+          padding: '2px 8px',
+          borderRadius: 6,
+          marginLeft: 4,
+          marginRight: 4,
         }}>
-          🎉 Beta access is free! Use code <strong>BETA100</strong> to unlock your full report at no cost.
-        </div>
-      )}
+          BETA100
+        </strong>
+        {' '}to unlock your full report at no cost.
+      </div>
+
+      <TopNav onLogo={onLogo} onAudit={onAudit} />
 
       {/* Header */}
       <section style={{
