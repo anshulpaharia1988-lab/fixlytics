@@ -1629,6 +1629,11 @@ export default function LandingPage({
                 title: "Built for site owners, not developers",
                 desc: "You do not need to know what H1 tags are. We explain everything.",
               },
+              {
+                icon: "🔒",
+                title: "Why does 'Locked in premium' show 0 sometimes?",
+                desc: "Premium locks only appear when your site has those specific issues. +0 means your site is clean in that area - that's actually good news!",
+              },
             ].map((row) => (
               <div key={row.title} style={{ display: "flex", gap: 14, marginBottom: 20 }}>
                 <span style={{ fontSize: 24, flexShrink: 0 }}>{row.icon}</span>
