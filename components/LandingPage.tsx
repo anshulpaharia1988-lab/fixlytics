@@ -1591,7 +1591,7 @@ export default function LandingPage({
             onClick={(e) => e.stopPropagation()}
             style={{
               background: "#fff", borderRadius: 20, padding: 36,
-              maxWidth: 480, width: "100%", position: "relative",
+              maxWidth: 580, width: "100%", position: "relative",
               boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
             }}
           >
@@ -1623,45 +1623,62 @@ export default function LandingPage({
               Most site owners don&apos;t know why. Fixlytics finds out in 90 seconds.
             </div>
 
-            {[
-              {
-                icon: "🎯",
-                title: "Not for SEO experts - for site owners",
-                desc: "Tools like Semrush cost $130/month and need an expert to use. Fixlytics gives you the most important fixes in plain English - no experience needed.",
-              },
-              {
-                icon: "⚡",
-                title: "Not another monthly subscription",
-                desc: "One-time $29. No hidden fees. No 'upgrade to see results.'",
-              },
-              {
-                icon: "🛠️",
-                title: "Fixes written in plain English",
-                desc: "Not 'optimize your LCP.' But 'your homepage image is 4MB - here is how to fix it.'",
-              },
-              {
-                icon: "🏆",
-                title: "Built for site owners, not developers",
-                desc: "You do not need to know what H1 tags are. We explain everything.",
-              },
-              {
-                icon: "🔒",
-                title: "Why does 'Locked in premium' show 0 sometimes?",
-                desc: "Premium locks only appear when your site has those specific issues. +0 means your site is clean in that area - that's actually good news!",
-              },
-            ].map((row) => (
-              <div key={row.title} style={{ display: "flex", gap: 14, marginBottom: 20 }}>
-                <span style={{ fontSize: 24, flexShrink: 0 }}>{row.icon}</span>
-                <div>
-                  <div style={{ fontWeight: 700, fontSize: 15, color: "var(--navy-800)" }}>
-                    {row.title}
-                  </div>
-                  <div style={{ fontSize: 13, color: "var(--fg-2)", marginTop: 4, lineHeight: 1.5 }}>
-                    {row.desc}
-                  </div>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 14,
+              marginBottom: 24,
+            }}>
+              {[
+                {
+                  icon: '🎯',
+                  title: 'Not for SEO experts - for site owners',
+                  desc: "Tools like Semrush cost $130/month and need an expert to use. Fixlytics gives you the most important fixes in plain English - no experience needed.",
+                },
+                {
+                  icon: '⚡',
+                  title: 'Not another monthly subscription',
+                  desc: "One-time $29. No hidden fees. No 'upgrade to see results.'",
+                },
+                {
+                  icon: '🛠️',
+                  title: 'Fixes written in plain English',
+                  desc: "Not 'optimize your LCP.' But 'your homepage image is 4MB - here is how to fix it.'",
+                },
+                {
+                  icon: '🏆',
+                  title: 'Built for site owners, not developers',
+                  desc: "You do not need to know what H1 tags are. We explain everything.",
+                },
+                {
+                  icon: '🔒',
+                  title: "Why does 'Locked in premium' show 0 sometimes?",
+                  desc: "Premium locks only appear when your site has those specific issues. +0 means your site is clean in that area - that's actually good news!",
+                },
+              ].map((item) => (
+                <div key={item.title} style={{
+                  background: 'var(--bg-muted)',
+                  borderRadius: 12,
+                  padding: '14px 16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 6,
+                }}>
+                  <div style={{ fontSize: 20 }}>{item.icon}</div>
+                  <div style={{
+                    fontWeight: 700,
+                    fontSize: 13,
+                    color: 'var(--navy-800)',
+                    lineHeight: 1.3,
+                  }}>{item.title}</div>
+                  <div style={{
+                    fontSize: 12,
+                    color: 'var(--fg-2)',
+                    lineHeight: 1.5,
+                  }}>{item.desc}</div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
 
             <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={scrollToInput}>
               Run my free audit
