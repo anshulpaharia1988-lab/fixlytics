@@ -1583,8 +1583,9 @@ export default function LandingPage({
           style={{
             position: "fixed", inset: 0, zIndex: 1000,
             background: "rgba(0,0,0,0.6)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            padding: 24,
+            overflowY: "auto",
+            display: "flex", alignItems: "flex-start", justifyContent: "center",
+            padding: "20px 16px",
           }}
         >
           <div
@@ -1593,6 +1594,8 @@ export default function LandingPage({
               background: "#fff", borderRadius: 20, padding: 36,
               maxWidth: 580, width: "100%", position: "relative",
               boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+              maxHeight: "90vh", overflowY: "auto",
+              margin: "auto",
             }}
           >
             {/* Close button */}
@@ -1625,7 +1628,7 @@ export default function LandingPage({
 
             <div style={{
               display: 'grid',
-              gridTemplateColumns: '1fr 1fr',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
               gap: 14,
               marginBottom: 24,
             }}>
