@@ -16,10 +16,19 @@ export async function POST(req: NextRequest) {
 
     console.log("[verify] payload:", { userEmail, auditUrl, hasOrderId: !!razorpay_order_id });
 
-    // Coupon-based free unlock: skip signature check, just save payment record
+    // Coupon-based free unlock: skip signature check, save record + notify
     if (coupon === true) {
       if (userEmail) {
         try { await savePayment(userEmail, auditUrl ?? ""); } catch {}
+        try {
+          const resend = new Resend(process.env.RESEND_API_KEY);
+          await resend.emails.send({
+            from: "Fixlytics <support@fixlytics.app>",
+            to: "anshul.paharia1988@gmail.com",
+            subject: `🎉 New beta user: ${userEmail}`,
+            html: `<p>New beta user: <strong>${userEmail}</strong> used BETA100 for <strong>${auditUrl ?? "unknown"}</strong></p>`,
+          });
+        } catch {}
       }
       return Response.json({ success: true });
     }

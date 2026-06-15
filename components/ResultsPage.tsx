@@ -534,10 +534,12 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
 }
 
 // ── LockedPremiumPanel ────────────────────────────────────────────────────────
-function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode, couponMessage, couponDiscount, onCouponChange, onCouponApply }: {
+function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode, couponMessage, couponDiscount, onCouponChange, onCouponApply, betaEmail, showBetaEmailInput, onBetaEmailChange, onBetaEmailSubmit }: {
   currency: string; price: number; lockedCount: number; onUnlock: () => void;
   couponCode: string; couponMessage: string; couponDiscount: number;
   onCouponChange: (code: string) => void; onCouponApply: () => void;
+  betaEmail: string; showBetaEmailInput: boolean;
+  onBetaEmailChange: (email: string) => void; onBetaEmailSubmit: () => void;
 }) {
   const effectivePrice = couponDiscount > 0 ? price * (1 - couponDiscount / 100) : price;
   return (
@@ -735,9 +737,48 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode
             )}
           </div>
 
-          <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
-            {couponDiscount === 100 ? "Unlock Free - Coupon Applied!" : "Unlock Full Report"}
-          </Button>
+          {showBetaEmailInput && couponDiscount === 100 ? (
+            <div>
+              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", marginBottom: 8, fontWeight: 600 }}>
+                Enter email to save your free access
+              </div>
+              <input
+                type="email"
+                value={betaEmail}
+                onChange={(e) => onBetaEmailChange(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && onBetaEmailSubmit()}
+                placeholder="your@email.com"
+                required
+                autoFocus
+                style={{
+                  width: "100%", padding: "10px 12px", fontSize: 13,
+                  background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.30)",
+                  borderRadius: 10, color: "#fff", fontFamily: "inherit",
+                  outline: "none", marginBottom: 10, boxSizing: "border-box" as const,
+                }}
+              />
+              <button
+                onClick={onBetaEmailSubmit}
+                disabled={!betaEmail.includes("@")}
+                style={{
+                  width: "100%", padding: "13px",
+                  background: betaEmail.includes("@")
+                    ? "linear-gradient(135deg, #00d467, #00a851)"
+                    : "rgba(255,255,255,0.12)",
+                  color: "#fff", border: "none", borderRadius: 10,
+                  fontFamily: "inherit", fontSize: 14, fontWeight: 700,
+                  cursor: betaEmail.includes("@") ? "pointer" : "default",
+                  boxShadow: betaEmail.includes("@") ? "0 4px 12px -2px rgba(0,199,88,0.36)" : "none",
+                }}
+              >
+                Get Free Access
+              </button>
+            </div>
+          ) : (
+            <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
+              {couponDiscount === 100 ? "Unlock Free - Coupon Applied!" : "Unlock Full Report"}
+            </Button>
+          )}
 
           <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.72)" }}>
             {[
@@ -823,6 +864,8 @@ export default function ResultsPage({
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackEmail, setFeedbackEmail] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [betaEmail, setBetaEmail] = useState('');
+  const [showBetaEmailInput, setShowBetaEmailInput] = useState(false);
   const [recoverStatus, setRecoverStatus] = useState<"idle" | "checking" | "found" | "found-need-login" | "not-found">("idle");
   const [couponCode, setCouponCode] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
@@ -990,19 +1033,26 @@ export default function ResultsPage({
   }
 
   // All unlock actions require a signed-in session.
-  // If not authenticated, redirect to /login then return to this page.
+  // 100% coupon bypasses sign-in — just collect email directly.
   function handleUnlock() {
     const sessionEmail = session?.user?.email;
+
+    if (couponDiscount === 100) {
+      const emailToUse = sessionEmail || betaEmail;
+      if (!emailToUse) {
+        setShowBetaEmailInput(true);
+        return;
+      }
+      handleFreeCouponUnlock(emailToUse);
+      return;
+    }
+
     if (!sessionEmail) {
       signIn(undefined, { callbackUrl: `/?url=${encodeURIComponent(url)}&view=results` });
       return;
     }
     setUserEmail(sessionEmail);
-    if (couponDiscount === 100) {
-      handleFreeCouponUnlock(sessionEmail);
-    } else {
-      runPayment();
-    }
+    runPayment();
   }
 
   async function handleRecoverAccess() {
@@ -1295,6 +1345,10 @@ export default function ResultsPage({
               couponDiscount={couponDiscount}
               onCouponChange={(code) => { setCouponCode(code); setCouponMessage(""); }}
               onCouponApply={applyCoupon}
+              betaEmail={betaEmail}
+              showBetaEmailInput={showBetaEmailInput}
+              onBetaEmailChange={setBetaEmail}
+              onBetaEmailSubmit={() => { if (betaEmail.includes("@")) handleFreeCouponUnlock(betaEmail); }}
             />
             {/* Already paid recovery link */}
             <div style={{ textAlign: "center", marginTop: 20 }}>
