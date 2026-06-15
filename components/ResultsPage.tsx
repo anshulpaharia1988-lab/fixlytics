@@ -1072,6 +1072,20 @@ export default function ResultsPage({
 
       <TopNav onLogo={onLogo} onAudit={onAudit} />
 
+      {/* Beta banner */}
+      {!isPaid && (
+        <div style={{
+          background: 'var(--green-glow)',
+          color: 'var(--green-700)',
+          padding: '10px 16px',
+          textAlign: 'center',
+          fontSize: 14,
+          fontWeight: 600,
+        }}>
+          🎉 Beta access is free! Use code <strong>BETA100</strong> to unlock your full report at no cost.
+        </div>
+      )}
+
       {/* Header */}
       <section style={{
         background: "linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%)",
