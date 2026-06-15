@@ -869,12 +869,12 @@ export default function ResultsPage({
 
   async function handleShare() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(`https://fixlytics.app/?url=${encodeURIComponent(url)}&view=results`);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for browsers that deny clipboard without interaction
-      window.prompt("Copy this link:", window.location.href);
+      window.prompt("Copy this link:", `https://fixlytics.app/?url=${encodeURIComponent(url)}&view=results`);
     }
   }
 

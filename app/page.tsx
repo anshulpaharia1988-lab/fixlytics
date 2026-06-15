@@ -50,8 +50,6 @@ export default function Home() {
         setView("results");
         // Persist so a refresh stays on results
         saveSession(urlParam, null);
-        // Clean up the query string without a full navigation
-        window.history.replaceState({}, "", "/");
         return () => { mounted = false; };
       }
     } catch { /* ignore */ }
@@ -93,6 +91,7 @@ export default function Home() {
     setAuditData(data);
     setView("results");
     saveSession(url, data);
+    window.history.pushState({}, "", `/?url=${encodeURIComponent(url)}&view=results`);
   }
 
   function handleLogo() {
@@ -101,6 +100,7 @@ export default function Home() {
     setUrl("");
     setAuditData(null);
     setUrlIsPaid(false);
+    window.history.pushState({}, "", "/");
   }
 
   if (view === "scan") {
