@@ -363,3 +363,15 @@ h3, .h3 {
   /* Ensure score ring strokes are visible */
   .score-ring circle { stroke-width: 8 !important; }
 }
+
+/* Popup scrollbar - thin, only visible when scrolling */
+.popup-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+.popup-scroll::-webkit-scrollbar-thumb {
+  background: var(--gray-300);
+  border-radius: 999px;
+}
+.popup-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}

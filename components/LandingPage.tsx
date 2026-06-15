@@ -1590,12 +1590,14 @@ export default function LandingPage({
         >
           <div
             onClick={(e) => e.stopPropagation()}
+            className="popup-scroll"
             style={{
               background: "#fff", borderRadius: 20, padding: 36,
               maxWidth: 580, width: "100%", position: "relative",
               boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
               maxHeight: "90vh", overflowY: "auto",
               margin: "auto",
+              scrollbarWidth: "thin",
             }}
           >
             {/* Close button */}
