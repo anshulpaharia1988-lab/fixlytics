@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     console.log("[verify] payload:", { userEmail, auditUrl, hasOrderId: !!razorpay_order_id });
 
     // Coupon-based free unlock: skip signature check, save record + notify
-    if (coupon === true) {
+    if (body.free === true && body.coupon === 'BETA100') {
       if (userEmail) {
         try { await savePayment(userEmail, auditUrl ?? ""); } catch {}
         try {
@@ -25,8 +25,8 @@ export async function POST(req: NextRequest) {
           await resend.emails.send({
             from: "Fixlytics <support@fixlytics.app>",
             to: "anshul.paharia1988@gmail.com",
-            subject: `🎉 New beta user: ${userEmail}`,
-            html: `<p>New beta user: <strong>${userEmail}</strong> used BETA100 for <strong>${auditUrl ?? "unknown"}</strong></p>`,
+            subject: "New beta user - BETA100 used",
+            html: `<p>Email: <strong>${userEmail}</strong><br/>Site: <strong>${auditUrl ?? "unknown"}</strong><br/>Time: ${new Date().toISOString()}</p>`,
           });
         } catch {}
       }

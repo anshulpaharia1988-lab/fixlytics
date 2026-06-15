@@ -534,12 +534,10 @@ function IssueCard({ issue, index, showFix, onUnlock }: { issue: Issue; index: n
 }
 
 // ── LockedPremiumPanel ────────────────────────────────────────────────────────
-function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode, couponMessage, couponDiscount, onCouponChange, onCouponApply, betaEmail, showBetaEmailInput, onBetaEmailChange, onBetaEmailSubmit }: {
+function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode, couponMessage, couponDiscount, onCouponChange, onCouponApply }: {
   currency: string; price: number; lockedCount: number; onUnlock: () => void;
   couponCode: string; couponMessage: string; couponDiscount: number;
   onCouponChange: (code: string) => void; onCouponApply: () => void;
-  betaEmail: string; showBetaEmailInput: boolean;
-  onBetaEmailChange: (email: string) => void; onBetaEmailSubmit: () => void;
 }) {
   const effectivePrice = couponDiscount > 0 ? price * (1 - couponDiscount / 100) : price;
   return (
@@ -737,48 +735,9 @@ function LockedPremiumPanel({ currency, price, lockedCount, onUnlock, couponCode
             )}
           </div>
 
-          {showBetaEmailInput && couponDiscount === 100 ? (
-            <div>
-              <div style={{ fontSize: 12.5, color: "rgba(255,255,255,0.85)", marginBottom: 8, fontWeight: 600 }}>
-                Enter email to save your free access
-              </div>
-              <input
-                type="email"
-                value={betaEmail}
-                onChange={(e) => onBetaEmailChange(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && onBetaEmailSubmit()}
-                placeholder="your@email.com"
-                required
-                autoFocus
-                style={{
-                  width: "100%", padding: "10px 12px", fontSize: 13,
-                  background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.30)",
-                  borderRadius: 10, color: "#fff", fontFamily: "inherit",
-                  outline: "none", marginBottom: 10, boxSizing: "border-box" as const,
-                }}
-              />
-              <button
-                onClick={onBetaEmailSubmit}
-                disabled={!betaEmail.includes("@")}
-                style={{
-                  width: "100%", padding: "13px",
-                  background: betaEmail.includes("@")
-                    ? "linear-gradient(135deg, #00d467, #00a851)"
-                    : "rgba(255,255,255,0.12)",
-                  color: "#fff", border: "none", borderRadius: 10,
-                  fontFamily: "inherit", fontSize: 14, fontWeight: 700,
-                  cursor: betaEmail.includes("@") ? "pointer" : "default",
-                  boxShadow: betaEmail.includes("@") ? "0 4px 12px -2px rgba(0,199,88,0.36)" : "none",
-                }}
-              >
-                Get Free Access
-              </button>
-            </div>
-          ) : (
-            <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
-              {couponDiscount === 100 ? "Unlock Free - Coupon Applied!" : "Unlock Full Report"}
-            </Button>
-          )}
+          <Button kind="primary" size="lg" full iconRight="arrow-right" onClick={onUnlock}>
+            {couponDiscount === 100 ? "Unlock Free - Coupon Applied!" : "Unlock Full Report"}
+          </Button>
 
           <div style={{ marginTop: 18, display: "flex", flexDirection: "column", gap: 8, fontSize: 13, color: "rgba(255,255,255,0.72)" }}>
             {[
@@ -959,7 +918,7 @@ export default function ResultsPage({
       await fetch("/api/payment/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ coupon: true, email, auditUrl: url }),
+        body: JSON.stringify({ email, auditUrl: url, coupon: 'BETA100', free: true }),
       });
     } catch {
       // Non-fatal: access already unlocked locally
@@ -1345,10 +1304,6 @@ export default function ResultsPage({
               couponDiscount={couponDiscount}
               onCouponChange={(code) => { setCouponCode(code); setCouponMessage(""); }}
               onCouponApply={applyCoupon}
-              betaEmail={betaEmail}
-              showBetaEmailInput={showBetaEmailInput}
-              onBetaEmailChange={setBetaEmail}
-              onBetaEmailSubmit={() => { if (betaEmail.includes("@")) handleFreeCouponUnlock(betaEmail); }}
             />
             {/* Already paid recovery link */}
             <div style={{ textAlign: "center", marginTop: 20 }}>
@@ -1365,6 +1320,105 @@ export default function ResultsPage({
             </div>
           </div>
         </section>
+      )}
+
+      {/* Beta email capture modal */}
+      {showBetaEmailInput && (
+        <div
+          onClick={() => setShowBetaEmailInput(false)}
+          style={{
+            position: "fixed", inset: 0, zIndex: 1001,
+            background: "rgba(5,13,26,0.78)",
+            backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            padding: 24,
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: "#fff", borderRadius: 28, padding: "44px 40px 36px",
+              maxWidth: 420, width: "100%", position: "relative",
+              boxShadow: "0 40px 80px -16px rgba(10,22,40,0.36)",
+              textAlign: "center",
+            }}
+          >
+            <button
+              onClick={() => setShowBetaEmailInput(false)}
+              style={{
+                position: "absolute", top: 16, right: 16,
+                background: "var(--bg-page)", border: "1px solid var(--border)",
+                borderRadius: 8, width: 32, height: 32, cursor: "pointer",
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                color: "var(--fg-3)", fontFamily: "inherit",
+              }}
+            >
+              <Icon name="x" size={16} />
+            </button>
+
+            <div style={{
+              width: 64, height: 64, borderRadius: 20, margin: "0 auto 20px",
+              background: "var(--green-glow)", border: "1.5px solid var(--green-200)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <Icon name="gift" size={28} color="var(--green-600)" />
+            </div>
+
+            <h3 style={{
+              fontSize: 22, fontWeight: 800, letterSpacing: "-0.025em",
+              color: "var(--navy-800)", margin: "0 0 10px",
+            }}>Where should we save your free access?</h3>
+            <p style={{ fontSize: 14, color: "var(--fg-2)", margin: "0 0 24px", lineHeight: 1.6 }}>
+              Enter your email and we&apos;ll save your access so you can return anytime.
+            </p>
+
+            <input
+              type="email"
+              value={betaEmail}
+              onChange={(e) => setBetaEmail(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && betaEmail.includes("@")) {
+                  handleFreeCouponUnlock(betaEmail);
+                  setShowBetaEmailInput(false);
+                }
+              }}
+              placeholder="your@email.com"
+              autoFocus
+              style={{
+                width: "100%", padding: "14px 16px", fontSize: 16,
+                border: "1.5px solid var(--border)", borderRadius: 12,
+                outline: "none", fontFamily: "inherit", boxSizing: "border-box" as const,
+                marginBottom: 12, color: "var(--navy-800)", background: "#fff",
+                textAlign: "center",
+              }}
+            />
+
+            <button
+              onClick={() => {
+                if (betaEmail.includes("@")) {
+                  handleFreeCouponUnlock(betaEmail);
+                  setShowBetaEmailInput(false);
+                }
+              }}
+              disabled={!betaEmail.includes("@")}
+              style={{
+                width: "100%", padding: "14px 24px",
+                background: betaEmail.includes("@") ? "linear-gradient(135deg, #00d467, #00a851)" : "var(--bg-page)",
+                color: betaEmail.includes("@") ? "#fff" : "var(--fg-3)",
+                border: betaEmail.includes("@") ? "none" : "1.5px solid var(--border)",
+                borderRadius: 14, cursor: betaEmail.includes("@") ? "pointer" : "default",
+                fontFamily: "inherit", fontSize: 15, fontWeight: 700,
+                letterSpacing: "-0.01em", marginBottom: 10,
+                boxShadow: betaEmail.includes("@") ? "0 8px 24px -4px rgba(0,199,88,0.40)" : "none",
+              }}
+            >
+              Unlock for free
+            </button>
+            <p style={{ fontSize: 12, color: "var(--fg-3)", margin: 0 }}>
+              We&apos;ll save your access so you can return anytime.
+            </p>
+          </div>
+        </div>
       )}
 
       {/* Already paid? recovery modal */}
