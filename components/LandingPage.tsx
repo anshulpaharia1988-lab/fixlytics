@@ -1610,9 +1610,9 @@ export default function LandingPage({
 
             {[
               {
-                icon: "🔍",
-                title: "See what Google really thinks of your site",
-                desc: "UX, SEO and Speed - all checked against 60+ real signals.",
+                icon: "🎯",
+                title: "Not for SEO experts - for site owners",
+                desc: "Tools like Semrush cost $130/month and need an expert to use. Fixlytics gives you the most important fixes in plain English - no experience needed.",
               },
               {
                 icon: "⚡",
