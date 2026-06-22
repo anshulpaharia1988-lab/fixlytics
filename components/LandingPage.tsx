@@ -863,26 +863,19 @@ export default function LandingPage({
   return (
     <div>
       {/* Beta banner */}
-      <div style={{
-        background: 'var(--navy-800)',
-        color: '#fff',
-        padding: '10px 16px',
-        textAlign: 'center',
-        fontSize: 14,
-        fontWeight: 500,
-      }}>
-        🎉 Beta access is free! Use code{' '}
-        <strong style={{
-          background: 'var(--green-glow)',
-          color: 'var(--green-700)',
-          padding: '2px 8px',
-          borderRadius: 6,
-          marginLeft: 4,
-          marginRight: 4,
-        }}>
-          BETA100
-        </strong>
-        {' '}to unlock your full report at no cost.
+      <div
+        onClick={() => document.querySelector('input')?.focus()}
+        style={{
+          background: 'var(--navy-800)',
+          color: '#fff',
+          padding: '10px 16px',
+          textAlign: 'center',
+          fontSize: 14,
+          fontWeight: 500,
+          cursor: 'pointer',
+        }}
+      >
+        🎉 Beta is free! Run your audit and use code BETA100 to unlock the full report.
       </div>
 
       <TopNav onLogo={() => window.scrollTo({ top: 0, behavior: "smooth" })} />
