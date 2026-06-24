@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   title: "Fixlytics | Fix Your Website in Minutes with AI",
   description:
     "Paste your link. We'll find the UX, SEO and speed issues holding you back - and write the fixes for you. No code. No jargon.",
+  icons: {
+    icon: '/favicon.ico',
+    apple: '/apple-icon.png',
+  },
 };
 
 const GA_ID      = process.env.NEXT_PUBLIC_GA_ID      || "G-E4T776TDLR";
