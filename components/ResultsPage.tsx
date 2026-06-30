@@ -1283,7 +1283,7 @@ export default function ResultsPage({
                 issue={issue}
                 index={i + 1}
                 showFix={isPaid || i < 2}
-                onUnlock={handleUnlock}
+                onUnlock={() => document.getElementById("paywall-section")?.scrollIntoView({ behavior: "smooth" })}
               />
             ))}
           </div>
