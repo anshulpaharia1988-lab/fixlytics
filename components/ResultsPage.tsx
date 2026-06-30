@@ -894,7 +894,7 @@ export default function ResultsPage({
       document.getElementById("paywall-section")?.scrollIntoView({ behavior: "smooth" });
       return;
     }
-    window.print();
+    setTimeout(() => { window.print(); }, 100);
   }
 
   function applyCoupon() {
